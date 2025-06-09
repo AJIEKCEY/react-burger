@@ -28,7 +28,7 @@ export const BurgerIngredients = ({
 					</Tab>
 				</ul>
 			</nav>
-			<div className={styles.scroll}>
+			<div className={`${styles.scroll} custom-scroll`}>
 				<div className={styles.ingredients_group}>
 					<h2 className='text text_type_main-medium mb-6'>Булки</h2>
 					{ingredients

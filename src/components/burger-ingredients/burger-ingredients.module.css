@@ -16,7 +16,8 @@
 }
 
 .scroll {
-	height: calc(100vh - 324px);
+	height: calc(100vh - 250px);
+	padding: 0 16px;
 	overflow: hidden auto;
 }
 
