@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { TIngredient } from '@utils/types.ts';
 import styles from './burger-constructor.module.css';
 import {
@@ -9,13 +9,24 @@ import {
 
 type TBurgerConstructorProps = {
 	ingredients: TIngredient[];
+	onOrderClick?: () => void;
 };
 
 export const BurgerConstructor = ({
 	ingredients,
+	onOrderClick = () => {},
 }: TBurgerConstructorProps): React.JSX.Element => {
-	const bun = ingredients.find((item) => item.type === 'bun');
-	const fillings = ingredients.filter((item) => item.type !== 'bun');
+	const [bun, setBun] = useState<TIngredient | undefined>();
+	const [fillings, setFillings] = useState<TIngredient[]>([]);
+
+	useEffect(() => {
+		if (ingredients.length > 0) {
+			const foundBun = ingredients.find((item) => item.type === 'bun');
+			setBun(foundBun);
+			const fondFillings = ingredients.filter((item) => item.type !== 'bun');
+			setFillings(fondFillings);
+		}
+	}, [ingredients]);
 
 	// На данном этапе предполагаем что булочки для низа и верха не могут быть разными.
 	const totalPrice = useMemo(() => {
@@ -72,7 +83,11 @@ export const BurgerConstructor = ({
 					</span>
 					<CurrencyIcon type='primary' />
 				</div>
-				<Button htmlType='button' type='primary' size='large'>
+				<Button
+					htmlType='button'
+					type='primary'
+					size='large'
+					onClick={onOrderClick}>
 					Оформить заказ
 				</Button>
 			</div>

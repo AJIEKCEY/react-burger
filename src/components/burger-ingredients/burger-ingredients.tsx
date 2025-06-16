@@ -6,13 +6,13 @@ import { BurgerIngredient } from '@components/burger-ingredient/burger-ingredien
 
 type TBurgerIngredientsProps = {
 	ingredients: TIngredient[];
+	onIngredientClick?: (ingredient: TIngredient) => void;
 };
 
 export const BurgerIngredients = ({
 	ingredients,
+	onIngredientClick = () => {},
 }: TBurgerIngredientsProps): React.JSX.Element => {
-	console.log(ingredients);
-
 	return (
 		<section className={styles.burger_ingredients}>
 			<nav className='mb-10'>
@@ -31,27 +31,42 @@ export const BurgerIngredients = ({
 			<div className={`${styles.scroll} custom-scroll`}>
 				<div className={styles.ingredients_group}>
 					<h2 className='text text_type_main-medium mb-6'>Булки</h2>
-					{ingredients
-						.filter((ingredient) => ingredient.type === 'bun')
-						.map((ingredient) => (
-							<BurgerIngredient key={ingredient._id} {...ingredient} />
-						))}
+					{ingredients.length > 0 &&
+						ingredients
+							.filter((ingredient) => ingredient.type === 'bun')
+							.map((ingredient) => (
+								<BurgerIngredient
+									key={ingredient._id}
+									onIngredientClick={onIngredientClick}
+									{...ingredient}
+								/>
+							))}
 				</div>
 				<div className={styles.ingredients_group}>
 					<h2 className='text text_type_main-medium mb-6'>Соусы</h2>
-					{ingredients
-						.filter((ingredient) => ingredient.type === 'sauce')
-						.map((ingredient) => (
-							<BurgerIngredient key={ingredient._id} {...ingredient} />
-						))}
+					{ingredients.length > 0 &&
+						ingredients
+							.filter((ingredient) => ingredient.type === 'sauce')
+							.map((ingredient) => (
+								<BurgerIngredient
+									key={ingredient._id}
+									onIngredientClick={onIngredientClick}
+									{...ingredient}
+								/>
+							))}
 				</div>
 				<div className={styles.ingredients_group}>
 					<h2 className='text text_type_main-medium mb-6'>Начинки</h2>
-					{ingredients
-						.filter((ingredient) => ingredient.type === 'main')
-						.map((ingredient) => (
-							<BurgerIngredient key={ingredient._id} {...ingredient} />
-						))}
+					{ingredients.length > 0 &&
+						ingredients
+							.filter((ingredient) => ingredient.type === 'main')
+							.map((ingredient) => (
+								<BurgerIngredient
+									key={ingredient._id}
+									onIngredientClick={onIngredientClick}
+									{...ingredient}
+								/>
+							))}
 				</div>
 			</div>
 		</section>
