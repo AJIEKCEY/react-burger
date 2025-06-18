@@ -1,0 +1,14 @@
+.container {
+	position: relative;
+	display: flex;
+	align-items: center;
+	width: 100%;
+}
+
+.dragIcon {
+	position: absolute;
+	left: 13px;
+	display: flex;
+	align-items: center;
+	cursor: move;
+}
