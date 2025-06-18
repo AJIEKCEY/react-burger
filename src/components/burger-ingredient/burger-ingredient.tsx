@@ -6,19 +6,19 @@ import {
 	CurrencyIcon,
 } from '@ya.praktikum/react-developer-burger-ui-components';
 
-type TBurgerIngredientProps = TIngredient & {
+type TBurgerIngredientProps = {
+	ingredient: TIngredient;
 	onIngredientClick?: (ingredient: TIngredient) => void;
 };
 
 export const BurgerIngredient = ({
 	onIngredientClick,
-	...ingredient
+	ingredient,
 }: TBurgerIngredientProps): React.JSX.Element => {
 	return (
 		<article
 			className={styles.card}
-			onClick={() => onIngredientClick?.(ingredient)}
-			role='presentation'>
+			onClick={() => onIngredientClick?.(ingredient)}>
 			<img
 				src={ingredient.image}
 				alt={ingredient.name}

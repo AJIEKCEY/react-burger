@@ -26,19 +26,14 @@ export const Modal = ({
 		};
 
 		document.addEventListener('keydown', handleEscClose);
+		// Prevent scrolling of the body when modal is open
+		document.body.style.overflow = 'hidden';
 
 		return () => {
 			document.removeEventListener('keydown', handleEscClose);
-		};
-	}, [onClose]);
-
-	// Prevent scrolling of the body when modal is open
-	useEffect(() => {
-		document.body.style.overflow = 'hidden';
-		return () => {
 			document.body.style.overflow = 'auto';
 		};
-	}, []);
+	}, [onClose]);
 
 	if (!modalRoot) {
 		console.error('Modal root element not found');

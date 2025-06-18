@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { TIngredient } from '@utils/types.ts';
 import styles from './burger-constructor.module.css';
+import { DraggableConstructorElement } from '@components/draggable-constructor-element/draggable-constructor-element.tsx';
 import {
 	ConstructorElement,
 	CurrencyIcon,
@@ -54,7 +55,7 @@ export const BurgerConstructor = ({
 				<div className={`${styles.fillings} custom-scroll`}>
 					{fillings.map((item) => (
 						<div className={styles.element} key={item._id}>
-							<ConstructorElement
+							<DraggableConstructorElement
 								text={item.name}
 								price={item.price}
 								thumbnail={item.image}

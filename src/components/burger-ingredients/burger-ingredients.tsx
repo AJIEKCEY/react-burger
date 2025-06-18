@@ -38,7 +38,7 @@ export const BurgerIngredients = ({
 								<BurgerIngredient
 									key={ingredient._id}
 									onIngredientClick={onIngredientClick}
-									{...ingredient}
+									ingredient={ingredient}
 								/>
 							))}
 				</div>
@@ -51,7 +51,7 @@ export const BurgerIngredients = ({
 								<BurgerIngredient
 									key={ingredient._id}
 									onIngredientClick={onIngredientClick}
-									{...ingredient}
+									ingredient={ingredient}
 								/>
 							))}
 				</div>
@@ -64,7 +64,7 @@ export const BurgerIngredients = ({
 								<BurgerIngredient
 									key={ingredient._id}
 									onIngredientClick={onIngredientClick}
-									{...ingredient}
+									ingredient={ingredient}
 								/>
 							))}
 				</div>
