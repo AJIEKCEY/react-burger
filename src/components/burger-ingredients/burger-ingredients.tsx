@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './burger-ingredients.module.css';
-import { TIngredient } from '@utils/types.ts';
+import { TIngredient } from '@/types/types';
 import { Tab } from '@ya.praktikum/react-developer-burger-ui-components';
 import { BurgerIngredient } from '@components/burger-ingredient/burger-ingredient.tsx';
 

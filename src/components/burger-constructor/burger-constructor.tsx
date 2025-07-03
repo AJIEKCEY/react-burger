@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { TIngredient } from '@utils/types.ts';
+import { TIngredient } from '@/types/types';
 import styles from './burger-constructor.module.css';
 import { DraggableConstructorElement } from '@components/draggable-constructor-element/draggable-constructor-element.tsx';
 import {

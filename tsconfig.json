@@ -29,7 +29,8 @@
 			"@services/*": ["src/services/*"],
 			"@utils/*": ["src/utils/*"],
 			"@hooks/*": ["src/hooks/*"],
-			"@pages/*": ["src/pages/*"]
+			"@pages/*": ["src/pages/*"],
+			"@types/*": ["src/types/*"]
 		}
 	},
 	"plugins": [{ "name": "typescript-plugin-css-modules" }],

@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './burger-ingredient.module.css';
-import { TIngredient } from '@utils/types.ts';
+import { TIngredient } from '@/types/types';
 import {
 	Counter,
 	CurrencyIcon,

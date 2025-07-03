@@ -4,7 +4,7 @@ import axios, {
 	isAxiosError,
 } from 'axios';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { TIngredient } from '@utils/types';
+import { TIngredient } from '@/types/types';
 
 export type TApiResponse = {
 	success: boolean;

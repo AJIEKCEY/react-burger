@@ -1,29 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import styles from './app.module.css';
+import { useDispatch, useSelector } from 'react-redux';
 import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
 import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
 import { AppHeader } from '@components/app-header/app-header';
-import { TIngredient } from '@utils/types';
-import { useApi, TApiResponse } from '@hooks/useApi';
 import { Modal } from '@components/modal/modal';
 import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
 import { OrderDetails } from '@components/order-details/order-details';
 import { Preloader } from '@components/preloader/preloader';
-
-const API_URL = 'https://norma.nomoreparties.space/api/ingredients';
+import { fetchIngredients } from '@services/actions/burger-ingredients';
+import type { AppDispatch } from '@services/store';
+import type { TIngredient, IInitialState } from '@/types/types';
+import styles from './app.module.css';
 
 export const App = (): React.JSX.Element => {
-	const { loading, error, result } = useApi<TApiResponse>(API_URL);
-	const [ingredients, setIngredients] = useState<TIngredient[]>([]);
+	const dispatch = useDispatch<AppDispatch>();
+	const {
+		items: ingredients,
+		loading,
+		error,
+	} = useSelector((state: IInitialState) => state.burgerIngredients);
 	const [selectedIngredient, setSelectedIngredient] =
 		useState<TIngredient | null>(null);
 	const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
 	useEffect(() => {
-		if (!error && result) {
-			setIngredients(result.data);
-		}
-	}, [result, error]);
+		dispatch(fetchIngredients());
+	}, [dispatch]);
 
 	const handleIngredientClick = (ingredient: TIngredient) => {
 		setSelectedIngredient(ingredient);
@@ -45,28 +47,28 @@ export const App = (): React.JSX.Element => {
 				className={`${styles.title} text text_type_main-large mt-10 mb-5 pl-5`}>
 				Соберите бургер
 			</h1>
-			{loading ? (
-				<div className={styles.loaderContainer}>
-					<Preloader />
-				</div>
-			) : error ? (
-				<div className={styles.errorContainer}>
-					<p className='text text_type_main-medium text_color_error'>
-						Ошибка загрузки данных. Попробуйте обновить страницу.
-					</p>
-				</div>
-			) : (
-				<main className={`${styles.main} pl-5 pr-5`}>
+			<main className={`${styles.main} pl-5 pr-5`}>
+				{loading ? (
+					<div className={styles.loaderContainer}>
+						<Preloader />
+					</div>
+				) : error ? (
+					<div className={styles.errorContainer}>
+						<p className='text text_type_main-medium text_color_error'>
+							Ошибка загрузки данных. Попробуйте обновить страницу.
+						</p>
+					</div>
+				) : (
 					<BurgerIngredients
 						ingredients={ingredients}
 						onIngredientClick={handleIngredientClick}
 					/>
-					<BurgerConstructor
-						ingredients={ingredients}
-						onOrderClick={handleOrderClick}
-					/>
-				</main>
-			)}
+				)}
+				<BurgerConstructor
+					ingredients={ingredients}
+					onOrderClick={handleOrderClick}
+				/>
+			</main>
 
 			{selectedIngredient && (
 				<Modal title='Детали ингредиента' onClose={handleCloseModals}>
