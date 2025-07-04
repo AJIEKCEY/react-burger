@@ -27,9 +27,9 @@ export const App = (): React.JSX.Element => {
 		dispatch(fetchIngredients());
 	}, [dispatch]);
 
-	const handleIngredientClick = (ingredient: TIngredient) => {
-		setSelectedIngredient(ingredient);
-	};
+	// const handleIngredientClick = (ingredient: TIngredient) => {
+	// 	setSelectedIngredient(ingredient);
+	// };
 
 	const handleCloseModals = () => {
 		setSelectedIngredient(null);
@@ -59,10 +59,7 @@ export const App = (): React.JSX.Element => {
 						</p>
 					</div>
 				) : (
-					<BurgerIngredients
-						ingredients={ingredients}
-						onIngredientClick={handleIngredientClick}
-					/>
+					<BurgerIngredients />
 				)}
 				<BurgerConstructor
 					ingredients={ingredients}

@@ -22,7 +22,20 @@ export interface IBurgerIngredientsState {
 	activeTab: TIngredientCategory;
 }
 
+// Интерфейс для элемента в конструкторе (с уникальным ID)
+export interface TConstructorIngredient extends TIngredient {
+	constructorId: string; // Уникальный ID для элемента в конструкторе
+}
+
+// Состояние конструктора бургера
+export interface IBurgerConstructorState {
+	bun: TIngredient | null;
+	fillings: TConstructorIngredient[];
+	totalPrice: number;
+}
+
 export interface IInitialState {
 	burgerIngredients: IBurgerIngredientsState;
+	burgerConstructor: IBurgerConstructorState;
 	// Здесь можно добавить другие состояния для других слайсов
 }

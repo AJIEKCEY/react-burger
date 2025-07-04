@@ -11,19 +11,26 @@ type TDraggableConstructorElementProps = {
 	price: number;
 	type?: 'top' | 'bottom';
 	isLocked?: boolean;
-	extraClass?: string;
-	handleClose?: () => void;
+	onRemove?: () => void;
 };
 
-export const DraggableConstructorElement: React.FC<
-	TDraggableConstructorElementProps
-> = (props) => {
+export const DraggableConstructorElement = ({
+	text,
+	price,
+	thumbnail,
+	onRemove,
+}: TDraggableConstructorElementProps): React.JSX.Element => {
 	return (
 		<div className={styles.container}>
 			<div className={styles.dragIcon}>
 				<DragIcon type='primary' />
 			</div>
-			<ConstructorElement {...props} />
+			<ConstructorElement
+				text={text}
+				price={price}
+				thumbnail={thumbnail}
+				handleClose={onRemove} // Передаем функцию удаления
+			/>
 		</div>
 	);
 };

@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { TIngredient } from '@/types/types';
+import React, { useEffect } from 'react';
+import { TIngredient, TConstructorIngredient } from '@/types/types';
 import styles from './burger-constructor.module.css';
 import { DraggableConstructorElement } from '@components/draggable-constructor-element/draggable-constructor-element.tsx';
 import {
@@ -7,6 +7,7 @@ import {
 	CurrencyIcon,
 	Button,
 } from '@ya.praktikum/react-developer-burger-ui-components';
+import { useBurgerConstructor } from '@hooks/use-burger-constructor';
 
 type TBurgerConstructorProps = {
 	ingredients: TIngredient[];
@@ -17,25 +18,31 @@ export const BurgerConstructor = ({
 	ingredients,
 	onOrderClick = () => {},
 }: TBurgerConstructorProps): React.JSX.Element => {
-	const [bun, setBun] = useState<TIngredient | undefined>();
-	const [fillings, setFillings] = useState<TIngredient[]>([]);
+	const {
+		bun,
+		fillings,
+		totalPrice,
+		handleSetIngredients,
+		handleOrderClick,
+		handleRemoveFilling,
+	} = useBurgerConstructor();
 
 	useEffect(() => {
 		if (ingredients.length > 0) {
-			const foundBun = ingredients.find((item) => item.type === 'bun');
-			setBun(foundBun);
-			const fondFillings = ingredients.filter((item) => item.type !== 'bun');
-			setFillings(fondFillings);
+			handleSetIngredients(ingredients);
 		}
-	}, [ingredients]);
+	}, [ingredients, handleSetIngredients]);
 
-	// На данном этапе предполагаем что булочки для низа и верха не могут быть разными.
-	const totalPrice = useMemo(() => {
-		return (
-			(bun ? bun.price * 2 : 0) +
-			fillings.reduce((sum, item) => sum + item.price, 0)
-		);
-	}, [bun, fillings]);
+	// // На данном этапе предполагаем что булочки для низа и верха не могут быть разными.
+	// const totalPrice = useMemo(() => {
+	// 	return (
+	// 		(bun ? bun.price * 2 : 0) +
+	// 		fillings.reduce((sum, item) => sum + item.price, 0)
+	// 	);
+	// }, [bun, fillings]);
+
+	// Используем переданный обработчик или внутренний
+	const handleOrder = onOrderClick || handleOrderClick;
 
 	return (
 		<section className={`${styles.burger_constructor} pt-25`}>
@@ -53,12 +60,13 @@ export const BurgerConstructor = ({
 				)}
 
 				<div className={`${styles.fillings} custom-scroll`}>
-					{fillings.map((item) => (
-						<div className={styles.element} key={item._id}>
+					{fillings.map((item: TConstructorIngredient) => (
+						<div className={styles.element} key={item.constructorId}>
 							<DraggableConstructorElement
 								text={item.name}
 								price={item.price}
 								thumbnail={item.image}
+								onRemove={() => handleRemoveFilling(item.constructorId)}
 							/>
 						</div>
 					))}
@@ -88,7 +96,8 @@ export const BurgerConstructor = ({
 					htmlType='button'
 					type='primary'
 					size='large'
-					onClick={onOrderClick}>
+					onClick={handleOrder}
+					disabled={!bun || fillings.length === 0}>
 					Оформить заказ
 				</Button>
 			</div>

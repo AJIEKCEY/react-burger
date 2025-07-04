@@ -1,4 +1,8 @@
-import { IInitialState, IBurgerIngredientsState } from '@/types/types';
+import {
+	IInitialState,
+	IBurgerIngredientsState,
+	IBurgerConstructorState,
+} from '@/types/types';
 
 // Начальное состояние для конкретного слайса
 export const initialBurgerIngredientsState: IBurgerIngredientsState = {
@@ -6,11 +10,17 @@ export const initialBurgerIngredientsState: IBurgerIngredientsState = {
 	loading: false,
 	error: null,
 	activeTab: 'bun',
-	selectedIngredient: null,
+};
+
+export const initialBurgerConstructorState: IBurgerConstructorState = {
+	bun: null,
+	fillings: [],
+	totalPrice: 0,
 };
 
 // Общее начальное состояние приложения
 export const initialState: IInitialState = {
 	burgerIngredients: initialBurgerIngredientsState,
+	burgerConstructor: initialBurgerConstructorState,
 	// Добавьте initialState для других слайсов здесь
 };
