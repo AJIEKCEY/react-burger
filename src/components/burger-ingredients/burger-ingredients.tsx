@@ -1,73 +1,64 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { BurgerIngredientTabs } from '@components/burger-ingredients-tabs/burger-ingredients-tabs';
+import { IngredientSection } from '@components/burger-ingredients-section/burger-ingredients-section';
+import { useBurgerIngredients } from '@hooks/use-burger-ingredients.ts';
+import { IInitialState, TIngredient } from '@/types/types';
 import styles from './burger-ingredients.module.css';
-import { TIngredient } from '@/types/types';
-import { Tab } from '@ya.praktikum/react-developer-burger-ui-components';
-import { BurgerIngredient } from '@components/burger-ingredient/burger-ingredient.tsx';
 
-type TBurgerIngredientsProps = {
-	ingredients: TIngredient[];
-	onIngredientClick?: (ingredient: TIngredient) => void;
-};
+export const BurgerIngredients = (): React.JSX.Element => {
+	const { items, loading, error } = useSelector(
+		(state: IInitialState) => state.burgerIngredients
+	);
+	const { activeTab, handleTabClick, handleScroll, containerRef, sectionRefs } =
+		useBurgerIngredients();
 
-export const BurgerIngredients = ({
-	ingredients,
-	onIngredientClick = () => {},
-}: TBurgerIngredientsProps): React.JSX.Element => {
+	// Группируем ингредиенты по типам
+	const groupedIngredients = {
+		bun: items.filter((item: TIngredient) => item.type === 'bun'),
+		sauce: items.filter((item: TIngredient) => item.type === 'sauce'),
+		main: items.filter((item: TIngredient) => item.type === 'main'),
+	};
+
+	// Подключаем обработчик прокрутки
+	useEffect(() => {
+		const container = containerRef.current;
+		if (container) {
+			container.addEventListener('scroll', handleScroll);
+			return () => container.removeEventListener('scroll', handleScroll);
+		}
+	}, [handleScroll]);
+
+	if (loading) return <div>Загрузка...</div>;
+	if (error) return <div>Ошибка: {error}</div>;
+
 	return (
 		<section className={styles.burger_ingredients}>
 			<nav className='mb-10'>
-				<ul className={styles.menu}>
-					<Tab value='bun' active={true} onClick={() => {}}>
-						Булки
-					</Tab>
-					<Tab value='sauce' active={false} onClick={() => {}}>
-						Соусы
-					</Tab>
-					<Tab value='main' active={false} onClick={() => {}}>
-						Начинки
-					</Tab>
-				</ul>
+				<BurgerIngredientTabs
+					activeTab={activeTab}
+					onTabClick={handleTabClick}
+				/>
 			</nav>
-			<div className={`${styles.scroll} custom-scroll`}>
-				<div className={styles.ingredients_group}>
-					<h2 className='text text_type_main-medium mb-6'>Булки</h2>
-					{ingredients.length > 0 &&
-						ingredients
-							.filter((ingredient) => ingredient.type === 'bun')
-							.map((ingredient) => (
-								<BurgerIngredient
-									key={ingredient._id}
-									onIngredientClick={onIngredientClick}
-									ingredient={ingredient}
-								/>
-							))}
-				</div>
-				<div className={styles.ingredients_group}>
-					<h2 className='text text_type_main-medium mb-6'>Соусы</h2>
-					{ingredients.length > 0 &&
-						ingredients
-							.filter((ingredient) => ingredient.type === 'sauce')
-							.map((ingredient) => (
-								<BurgerIngredient
-									key={ingredient._id}
-									onIngredientClick={onIngredientClick}
-									ingredient={ingredient}
-								/>
-							))}
-				</div>
-				<div className={styles.ingredients_group}>
-					<h2 className='text text_type_main-medium mb-6'>Начинки</h2>
-					{ingredients.length > 0 &&
-						ingredients
-							.filter((ingredient) => ingredient.type === 'main')
-							.map((ingredient) => (
-								<BurgerIngredient
-									key={ingredient._id}
-									onIngredientClick={onIngredientClick}
-									ingredient={ingredient}
-								/>
-							))}
-				</div>
+			<div
+				ref={containerRef}
+				className={`${styles.scroll} custom-scroll`}
+				onScroll={handleScroll}>
+				<IngredientSection
+					ref={sectionRefs.bunRef}
+					title='Булки'
+					ingredients={groupedIngredients.bun}
+				/>
+				<IngredientSection
+					ref={sectionRefs.sauceRef}
+					title='Соусы'
+					ingredients={groupedIngredients.sauce}
+				/>
+				<IngredientSection
+					ref={sectionRefs.mainRef}
+					title='Начинки'
+					ingredients={groupedIngredients.main}
+				/>
 			</div>
 		</section>
 	);

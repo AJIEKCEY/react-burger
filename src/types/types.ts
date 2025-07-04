@@ -20,8 +20,6 @@ export interface IBurgerIngredientsState {
 	loading: boolean;
 	error: string | null;
 	activeTab: TIngredientCategory;
-	// Опционально, если нужно хранить выбранный ингредиент
-	selectedIngredient: TIngredient | null;
 }
 
 export interface IInitialState {

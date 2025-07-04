@@ -1,6 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { fetchIngredients } from '@services/actions/burger-ingredients.ts';
 import { initialBurgerIngredientsState } from '@services/initial-state.ts';
+import type { TIngredientCategory } from '@/types/types';
 
 // Создаем slice с помощью RTK
 const burgerIngredientsSlice = createSlice({
@@ -8,7 +9,14 @@ const burgerIngredientsSlice = createSlice({
 	initialState: initialBurgerIngredientsState,
 	reducers: {
 		// Здесь будут редьюсеры
-		setActiveTab: (state, action) => {
+		setActiveTab: (state, action: PayloadAction<TIngredientCategory>) => {
+			state.activeTab = action.payload;
+		},
+		// Добавляем action для автоматического переключения таба при прокрутке
+		setActiveTabFromScroll: (
+			state,
+			action: PayloadAction<TIngredientCategory>
+		) => {
 			state.activeTab = action.payload;
 		},
 	},
@@ -30,5 +38,6 @@ const burgerIngredientsSlice = createSlice({
 	},
 });
 
-export const { setActiveTab } = burgerIngredientsSlice.actions;
+export const { setActiveTab, setActiveTabFromScroll } =
+	burgerIngredientsSlice.actions;
 export default burgerIngredientsSlice.reducer;
