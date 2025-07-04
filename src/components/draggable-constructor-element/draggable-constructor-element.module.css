@@ -12,3 +12,11 @@
 	align-items: center;
 	cursor: move;
 }
+
+.container:active {
+	cursor: grabbing;
+}
+
+.dragging {
+	opacity: 0.2;
+}

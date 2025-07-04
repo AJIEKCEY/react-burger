@@ -1,6 +1,8 @@
 import React from 'react';
 import styles from './burger-ingredient.module.css';
 import { TIngredient } from '@/types/types';
+import { useDrag } from 'react-dnd';
+import { DND_TYPES } from '@/constants/dnd';
 import {
 	Counter,
 	CurrencyIcon,
@@ -8,16 +10,27 @@ import {
 
 type TBurgerIngredientProps = {
 	ingredient: TIngredient;
+	count?: number;
 	onIngredientClick?: (ingredient: TIngredient) => void;
 };
 
 export const BurgerIngredient = ({
 	onIngredientClick,
+	count = 0,
 	ingredient,
 }: TBurgerIngredientProps): React.JSX.Element => {
+	const [{ isDragging }, dragRef] = useDrag({
+		type: DND_TYPES.INGREDIENT,
+		item: ingredient,
+		collect: (monitor) => ({
+			isDragging: monitor.isDragging(),
+		}),
+	});
+
 	return (
 		<article
-			className={styles.card}
+			ref={dragRef}
+			className={`${styles.card} ${isDragging ? styles.dragging : ''}`}
 			onClick={() => onIngredientClick?.(ingredient)}>
 			<img
 				src={ingredient.image}
@@ -33,7 +46,7 @@ export const BurgerIngredient = ({
 			<p className={`${styles.name} text text_type_main-default`}>
 				{ingredient.name}
 			</p>
-			<Counter count={1} size='default' />
+			{count > 0 && <Counter count={count} size='default' />}
 		</article>
 	);
 };

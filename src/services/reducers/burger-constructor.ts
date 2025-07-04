@@ -26,6 +26,25 @@ const burgerConstructorSlice = createSlice({
 			burgerConstructorSlice.caseReducers.calculateTotalPrice(state);
 		},
 
+		// Добавление ингредиента (универсальное действие для DnD)
+		addIngredient: (state, action: PayloadAction<TIngredient>) => {
+			const ingredient = action.payload;
+
+			if (ingredient.type === 'bun') {
+				// Заменяем булочку
+				state.bun = ingredient;
+			} else {
+				// Добавляем начинку
+				const newFilling: TConstructorIngredient = {
+					...ingredient,
+					constructorId: nanoid(),
+				};
+				state.fillings.push(newFilling);
+			}
+
+			burgerConstructorSlice.caseReducers.calculateTotalPrice(state);
+		},
+
 		// Удаление начинки по constructorId
 		removeFilling: (state, action: PayloadAction<string>) => {
 			state.fillings = state.fillings.filter(
@@ -34,14 +53,38 @@ const burgerConstructorSlice = createSlice({
 			burgerConstructorSlice.caseReducers.calculateTotalPrice(state);
 		},
 
-		// Перемещение начинки (для будущего DnD)
+		// Перемещение начинки (для сортировки)
 		moveFilling: (
 			state,
-			action: PayloadAction<{ fromIndex: number; toIndex: number }>
+			action: PayloadAction<{ dragIndex: number; hoverIndex: number }>
 		) => {
-			const { fromIndex, toIndex } = action.payload;
-			const [movedItem] = state.fillings.splice(fromIndex, 1);
-			state.fillings.splice(toIndex, 0, movedItem);
+			const { dragIndex, hoverIndex } = action.payload;
+
+			// Проверяем валидность индексов
+			if (
+				dragIndex < 0 ||
+				dragIndex >= state.fillings.length ||
+				hoverIndex < 0 ||
+				hoverIndex >= state.fillings.length ||
+				dragIndex === hoverIndex
+			) {
+				return;
+			}
+
+			// Создаем новый массив для избежания мутаций
+			const newFillings = [...state.fillings];
+
+			// Получаем перетаскиваемый элемент
+			const draggedItem = newFillings[dragIndex];
+
+			// Удаляем элемент из старой позиции
+			newFillings.splice(dragIndex, 1);
+
+			// Вставляем элемент в новую позицию
+			newFillings.splice(hoverIndex, 0, draggedItem);
+
+			// Обновляем состояние
+			state.fillings = newFillings;
 		},
 
 		// Очистка конструктора
@@ -85,6 +128,7 @@ const burgerConstructorSlice = createSlice({
 export const {
 	setBun,
 	addFilling,
+	addIngredient,
 	removeFilling,
 	moveFilling,
 	clearConstructor,

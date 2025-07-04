@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from './redux';
 import {
 	setBun,
 	addFilling,
+	addIngredient,
 	removeFilling,
 	moveFilling,
 	clearConstructor,
@@ -32,6 +33,14 @@ export const useBurgerConstructor = () => {
 		[dispatch]
 	);
 
+	// Добавление ингредиента (универсальное для DnD)
+	const handleAddIngredient = useCallback(
+		(ingredient: TIngredient) => {
+			dispatch(addIngredient(ingredient));
+		},
+		[dispatch]
+	);
+
 	// Удаление начинки
 	const handleRemoveFilling = useCallback(
 		(constructorId: string) => {
@@ -42,8 +51,8 @@ export const useBurgerConstructor = () => {
 
 	// Перемещение начинки
 	const handleMoveFilling = useCallback(
-		(fromIndex: number, toIndex: number) => {
-			dispatch(moveFilling({ fromIndex, toIndex }));
+		(dragIndex: number, hoverIndex: number) => {
+			dispatch(moveFilling({ dragIndex, hoverIndex }));
 		},
 		[dispatch]
 	);
@@ -90,6 +99,7 @@ export const useBurgerConstructor = () => {
 		// Действия
 		handleSetBun,
 		handleAddFilling,
+		handleAddIngredient,
 		handleRemoveFilling,
 		handleMoveFilling,
 		handleClearConstructor,
