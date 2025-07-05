@@ -1,0 +1,15 @@
+/* Глобальные стили для приложения */
+
+/* Правила для кастомного скрола */
+
+.custom-scroll::-webkit-scrollbar {
+	width: 8px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+	background: #2f2f37;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+	background: #8585ad;
+}

@@ -10,6 +10,7 @@ import { OrderDetails } from '@components/order-details/order-details';
 import { Preloader } from '@components/preloader/preloader';
 import { fetchIngredients } from '@services/actions/burger-ingredients';
 import styles from './app.module.css';
+import '@/styles/global.css';
 
 export const App = (): React.JSX.Element => {
 	const dispatch = useAppDispatch();

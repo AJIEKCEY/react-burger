@@ -42,7 +42,6 @@
 	background-color: rgb(76 76 255 / 10%);
 }
 
-.bunPlaceholder,
 .emptyFillings {
 	display: flex;
 	justify-content: center;
@@ -52,17 +51,4 @@
 	background-color: rgb(76 76 255 / 5%);
 	border: 2px dashed #4c4cff;
 	border-radius: 8px;
-}
-
-.placeholder {
-	padding: 20px;
-	text-align: center;
-}
-
-.element:active {
-	cursor: grabbing;
-}
-
-.dragging {
-	opacity: 0.3;
 }
