@@ -34,11 +34,37 @@ export interface IBurgerConstructorState {
 	totalPrice: number;
 }
 
+// Типы для заказа
+export interface TOrderRequest {
+	ingredients: string[];
+}
+
+export interface TOrderResponse {
+	success: boolean;
+	name: string;
+	order: {
+		number: number;
+	};
+}
+
+// Состояние заказа
+export interface IOrderState {
+	orderNumber: number | null;
+	orderName: string | null;
+	loading: boolean;
+	error: string | null;
+}
+
 //Состояние модального окна
 export interface IModalState {
 	ingredientDetails: {
 		isOpen: boolean;
 		ingredient: TIngredient | null;
+	};
+	orderDetails: {
+		isOpen: boolean;
+		orderNumber: number | null;
+		orderName: string | null;
 	};
 }
 

@@ -1,10 +1,21 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { TIngredient } from '@/types/types';
-import { initialModalState } from '@services/initial-state';
+import { IModalState, TIngredient } from '@/types/types';
+
+const initialState: IModalState = {
+	ingredientDetails: {
+		isOpen: false,
+		ingredient: null,
+	},
+	orderDetails: {
+		isOpen: false,
+		orderNumber: null,
+		orderName: null,
+	},
+};
 
 export const modalSlice = createSlice({
 	name: 'modal',
-	initialState: initialModalState,
+	initialState,
 	reducers: {
 		openIngredientDetails: (state, action: PayloadAction<TIngredient>) => {
 			state.ingredientDetails.isOpen = true;
@@ -14,9 +25,26 @@ export const modalSlice = createSlice({
 			state.ingredientDetails.isOpen = false;
 			state.ingredientDetails.ingredient = null;
 		},
+		openOrderModal: (
+			state,
+			action: PayloadAction<{ orderNumber: number; orderName: string }>
+		) => {
+			state.orderDetails.isOpen = true;
+			state.orderDetails.orderNumber = action.payload.orderNumber;
+			state.orderDetails.orderName = action.payload.orderName;
+		},
+		closeOrderModal: (state) => {
+			state.orderDetails.isOpen = false;
+			state.orderDetails.orderNumber = null;
+			state.orderDetails.orderName = null;
+		},
 	},
 });
 
-export const { openIngredientDetails, closeIngredientDetails } =
-	modalSlice.actions;
+export const {
+	openIngredientDetails,
+	closeIngredientDetails,
+	openOrderModal,
+	closeOrderModal,
+} = modalSlice.actions;
 export default modalSlice.reducer;

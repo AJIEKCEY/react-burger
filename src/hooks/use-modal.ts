@@ -2,24 +2,39 @@ import { useAppDispatch, useAppSelector } from './redux';
 import {
 	openIngredientDetails,
 	closeIngredientDetails,
+	openOrderModal,
+	closeOrderModal,
 } from '@services/reducers/ingredient-modal';
 import { TIngredient } from '@/types/types';
 
 export const useModal = () => {
 	const dispatch = useAppDispatch();
-	const modalState = useAppSelector((state) => state.modal);
+	const { ingredientDetails, orderDetails } = useAppSelector(
+		(state) => state.modal
+	);
 
-	const openIngredientModal = (ingredient: TIngredient) => {
+	const handleOpenIngredientModal = (ingredient: TIngredient) => {
 		dispatch(openIngredientDetails(ingredient));
 	};
 
-	const closeIngredientModal = () => {
+	const handleCloseIngredientModal = () => {
 		dispatch(closeIngredientDetails());
 	};
 
+	const handleOpenOrderModal = (orderNumber: number, orderName: string) => {
+		dispatch(openOrderModal({ orderNumber, orderName }));
+	};
+
+	const handleCloseOrderModal = () => {
+		dispatch(closeOrderModal());
+	};
+
 	return {
-		ingredientModal: modalState.ingredientDetails,
-		openIngredientModal,
-		closeIngredientModal,
+		ingredientModal: ingredientDetails,
+		orderModal: orderDetails,
+		openIngredientModal: handleOpenIngredientModal,
+		closeIngredientModal: handleCloseIngredientModal,
+		openOrderModal: handleOpenOrderModal,
+		closeOrderModal: handleCloseOrderModal,
 	};
 };

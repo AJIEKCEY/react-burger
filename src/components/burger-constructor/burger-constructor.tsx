@@ -13,17 +13,16 @@ import { useBurgerConstructor } from '@hooks/use-burger-constructor';
 
 type TBurgerConstructorProps = {
 	ingredients?: TIngredient[];
-	onOrderClick?: () => void;
 };
 
 export const BurgerConstructor = ({
 	ingredients = [] as TIngredient[],
-	onOrderClick = () => {},
 }: TBurgerConstructorProps): React.JSX.Element => {
 	const {
 		bun,
 		fillings,
 		totalPrice,
+		orderLoading,
 		handleSetIngredients,
 		handleOrderClick,
 		handleRemoveFilling,
@@ -48,9 +47,6 @@ export const BurgerConstructor = ({
 			handleSetIngredients(ingredients);
 		}
 	}, [ingredients, handleSetIngredients]);
-
-	// Используем переданный обработчик или внутренний
-	const handleOrder = onOrderClick || handleOrderClick;
 
 	return (
 		<section className={`${styles.burger_constructor} pt-25`}>
@@ -114,9 +110,9 @@ export const BurgerConstructor = ({
 					htmlType='button'
 					type='primary'
 					size='large'
-					onClick={handleOrder}
-					disabled={!bun || fillings.length === 0}>
-					Оформить заказ
+					onClick={handleOrderClick}
+					disabled={!bun || fillings.length === 0 || orderLoading}>
+					{orderLoading ? 'Оформление...' : 'Оформить заказ'}
 				</Button>
 			</div>
 		</section>

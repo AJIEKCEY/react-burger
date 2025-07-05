@@ -1,39 +1,25 @@
 import { useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from './redux';
+import { useAppDispatch, useAppSelector } from '@hooks/redux';
 import {
-	setBun,
-	addFilling,
 	addIngredient,
 	removeFilling,
 	moveFilling,
 	clearConstructor,
 	setIngredients,
-} from '@/services/reducers/burger-constructor';
-import { IInitialState, TIngredient } from '@/types/types';
+} from '@services/reducers/burger-constructor';
+import { createOrder } from '@services/actions/order';
+import { clearOrder } from '@services/reducers/order';
+import { useModal } from '@hooks/use-modal';
+import { TIngredient } from '@/types/types';
 
 export const useBurgerConstructor = () => {
 	const dispatch = useAppDispatch();
 	const { bun, fillings, totalPrice } = useAppSelector(
-		(state: IInitialState) => state.burgerConstructor
+		(state) => state.burgerConstructor
 	);
+	const { loading: orderLoading } = useAppSelector((state) => state.order);
+	const { openOrderModal } = useModal();
 
-	// Добавление булочки
-	const handleSetBun = useCallback(
-		(ingredient: TIngredient) => {
-			dispatch(setBun(ingredient));
-		},
-		[dispatch]
-	);
-
-	// Добавление начинки
-	const handleAddFilling = useCallback(
-		(ingredient: TIngredient) => {
-			dispatch(addFilling(ingredient));
-		},
-		[dispatch]
-	);
-
-	// Добавление ингредиента (универсальное для DnD)
 	const handleAddIngredient = useCallback(
 		(ingredient: TIngredient) => {
 			dispatch(addIngredient(ingredient));
@@ -41,7 +27,6 @@ export const useBurgerConstructor = () => {
 		[dispatch]
 	);
 
-	// Удаление начинки
 	const handleRemoveFilling = useCallback(
 		(constructorId: string) => {
 			dispatch(removeFilling(constructorId));
@@ -49,7 +34,6 @@ export const useBurgerConstructor = () => {
 		[dispatch]
 	);
 
-	// Перемещение начинки
 	const handleMoveFilling = useCallback(
 		(dragIndex: number, hoverIndex: number) => {
 			dispatch(moveFilling({ dragIndex, hoverIndex }));
@@ -57,12 +41,6 @@ export const useBurgerConstructor = () => {
 		[dispatch]
 	);
 
-	// Очистка конструктора
-	const handleClearConstructor = useCallback(() => {
-		dispatch(clearConstructor());
-	}, [dispatch]);
-
-	// Установка ингредиентов (для совместимости)
 	const handleSetIngredients = useCallback(
 		(ingredients: TIngredient[]) => {
 			dispatch(setIngredients(ingredients));
@@ -70,40 +48,52 @@ export const useBurgerConstructor = () => {
 		[dispatch]
 	);
 
-	// Обработчик оформления заказа
-	const handleOrderClick = useCallback(() => {
-		if (!bun) {
-			alert('Пожалуйста, выберите булочку для бургера');
-			return;
-		}
+	const handleClearConstructor = useCallback(() => {
+		dispatch(clearConstructor());
+	}, [dispatch]);
 
-		if (fillings.length === 0) {
-			alert('Пожалуйста, добавьте начинку для бургера');
-			return;
-		}
+	const handleOrderClick = useCallback(async () => {
+		if (!bun || fillings.length === 0) return;
 
-		// Здесь будет логика создания заказа
-		console.log('Создание заказа:', {
-			bun,
-			fillings,
-			totalPrice,
-		});
-	}, [bun, fillings, totalPrice]);
+		// Собираем массив ID ингредиентов для заказа
+		const ingredientIds = [
+			bun._id, // Булка снизу
+			...fillings.map((filling) => filling._id), // Начинки
+			bun._id, // Булка сверху
+		];
+
+		try {
+			// Создаем заказ
+			const result = await dispatch(
+				createOrder({ ingredients: ingredientIds })
+			);
+
+			if (createOrder.fulfilled.match(result)) {
+				// Открываем модальное окно с деталями заказа
+				openOrderModal(result.payload.order.number, result.payload.name);
+				// Очищаем конструктор после успешного заказа
+				handleClearConstructor();
+			}
+		} catch (error) {
+			console.error('Ошибка при создании заказа:', error);
+		}
+	}, [bun, fillings, dispatch, openOrderModal, handleClearConstructor]);
+
+	const handleClearOrder = useCallback(() => {
+		dispatch(clearOrder());
+	}, [dispatch]);
 
 	return {
-		// Состояние
 		bun,
 		fillings,
 		totalPrice,
-
-		// Действия
-		handleSetBun,
-		handleAddFilling,
+		orderLoading,
 		handleAddIngredient,
 		handleRemoveFilling,
 		handleMoveFilling,
-		handleClearConstructor,
 		handleSetIngredients,
+		handleClearConstructor,
 		handleOrderClick,
+		handleClearOrder,
 	};
 };

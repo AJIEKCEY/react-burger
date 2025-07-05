@@ -5,12 +5,14 @@ import burgerConstructorReducer from '@services/reducers/burger-constructor';
 import { combineSlices, configureStore as createStore } from '@reduxjs/toolkit';
 import type { Reducer } from '@reduxjs/toolkit';
 import type { IInitialState } from '@/types/types';
-import modalSlice from '@services/reducers/ingredient-modal.ts';
+import modalReducer from '@services/reducers/ingredient-modal';
+import orderReducer from '@services/reducers/order';
 
 const rootReducer: Reducer<IInitialState> = combineSlices({
 	burgerIngredients: burgerIngredientsSlice,
 	burgerConstructor: burgerConstructorReducer,
-	modal: modalSlice,
+	order: orderReducer,
+	modal: modalReducer,
 });
 
 export const configureStore = () => {

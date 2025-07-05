@@ -6,7 +6,7 @@ import { AppHeader } from '@components/app-header/app-header';
 import { Modal } from '@components/modal/modal';
 import { useModal } from '@hooks/use-modal';
 import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
-//import { OrderDetails } from '@components/order-details/order-details';
+import { OrderDetails } from '@components/order-details/order-details';
 import { Preloader } from '@components/preloader/preloader';
 import { fetchIngredients } from '@services/actions/burger-ingredients';
 import type { AppDispatch } from '@services/store';
@@ -19,13 +19,12 @@ export const App = (): React.JSX.Element => {
 		(state: IInitialState) => state.burgerIngredients
 	);
 
-	const { ingredientModal, closeIngredientModal } = useModal();
+	const { ingredientModal, orderModal, closeIngredientModal, closeOrderModal } =
+		useModal();
 
 	useEffect(() => {
 		dispatch(fetchIngredients());
 	}, [dispatch]);
-
-	console.log('App: ingredientModal state:', ingredientModal); // Отладка
 
 	return (
 		<div className={styles.app}>
@@ -51,7 +50,7 @@ export const App = (): React.JSX.Element => {
 				<BurgerConstructor />
 			</main>
 
-			{ingredientModal.isOpen && (
+			{ingredientModal?.isOpen && (
 				<Modal onClose={closeIngredientModal} title='Детали ингредиента'>
 					{ingredientModal.ingredient && (
 						<IngredientDetails ingredient={ingredientModal.ingredient} />
@@ -59,11 +58,15 @@ export const App = (): React.JSX.Element => {
 				</Modal>
 			)}
 
-			{/*{isOrderModalOpen && (*/}
-			{/*	<Modal onClose={handleCloseModals}>*/}
-			{/*		<OrderDetails orderNumber={123456} />*/}
-			{/*	</Modal>*/}
-			{/*)}*/}
+			{/* Модальное окно заказа */}
+			{orderModal?.isOpen && (
+				<Modal onClose={closeOrderModal}>
+					<OrderDetails
+						orderNumber={orderModal.orderNumber!}
+						orderName={orderModal.orderName!}
+					/>
+				</Modal>
+			)}
 		</div>
 	);
 };

@@ -24,6 +24,11 @@ export const initialModalState: IModalState = {
 		isOpen: false,
 		ingredient: null,
 	},
+	orderDetails: {
+		isOpen: false,
+		orderNumber: null,
+		orderName: null,
+	},
 };
 
 // Общее начальное состояние приложения
