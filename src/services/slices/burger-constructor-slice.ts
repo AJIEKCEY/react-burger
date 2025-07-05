@@ -1,0 +1,125 @@
+import { createSlice, PayloadAction, nanoid } from '@reduxjs/toolkit';
+import type {
+	TIngredient,
+	TConstructorIngredient,
+	IBurgerConstructorState,
+} from '@/types/types';
+
+const initialState: IBurgerConstructorState = {
+	bun: null,
+	fillings: [],
+	totalPrice: 0,
+};
+
+const burgerConstructorSlice = createSlice({
+	name: 'burgerConstructor',
+	initialState,
+	reducers: {
+		// Добавление ингредиента (универсальное действие для DnD)
+		addIngredient: (state, action: PayloadAction<TIngredient>) => {
+			const ingredient = action.payload;
+
+			if (ingredient.type === 'bun') {
+				// Заменяем булочку
+				state.bun = ingredient;
+			} else {
+				// Добавляем начинку
+				const newFilling: TConstructorIngredient = {
+					...ingredient,
+					constructorId: nanoid(),
+				};
+				state.fillings.push(newFilling);
+			}
+
+			burgerConstructorSlice.caseReducers.calculateTotalPrice(state);
+		},
+
+		// Удаление начинки по constructorId
+		removeFilling: (state, action: PayloadAction<string>) => {
+			state.fillings = state.fillings.filter(
+				(item) => item.constructorId !== action.payload
+			);
+			burgerConstructorSlice.caseReducers.calculateTotalPrice(state);
+		},
+
+		// Перемещение начинки (для сортировки)
+		moveFilling: (
+			state,
+			action: PayloadAction<{ dragIndex: number; hoverIndex: number }>
+		) => {
+			const { dragIndex, hoverIndex } = action.payload;
+
+			// Проверяем валидность индексов
+			if (
+				dragIndex < 0 ||
+				dragIndex >= state.fillings.length ||
+				hoverIndex < 0 ||
+				hoverIndex >= state.fillings.length ||
+				dragIndex === hoverIndex
+			) {
+				return;
+			}
+
+			// Создаем новый массив для избежания мутаций
+			const newFillings = [...state.fillings];
+
+			// Получаем перетаскиваемый элемент
+			const draggedItem = newFillings[dragIndex];
+
+			// Удаляем элемент из старой позиции
+			newFillings.splice(dragIndex, 1);
+
+			// Вставляем элемент в новую позицию
+			newFillings.splice(hoverIndex, 0, draggedItem);
+
+			// Обновляем состояние
+			state.fillings = newFillings;
+		},
+
+		// Очистка конструктора
+		clearConstructor: (state) => {
+			state.bun = null;
+			state.fillings = [];
+			state.totalPrice = 0;
+		},
+
+		// Установка ингредиентов из массива (для совместимости с текущим API)
+		setIngredients: (state, action: PayloadAction<TIngredient[]>) => {
+			const ingredients = action.payload;
+
+			// Находим булочку
+			const foundBun = ingredients.find((item) => item.type === 'bun');
+			state.bun = foundBun || null;
+
+			// Находим начинки и добавляем им constructorId
+			state.fillings = ingredients
+				.filter((item) => item.type !== 'bun')
+				.map((item) => ({
+					...item,
+					constructorId: nanoid(),
+				}));
+
+			burgerConstructorSlice.caseReducers.calculateTotalPrice(state);
+		},
+
+		// Внутренний reducer для расчета общей стоимости
+		calculateTotalPrice: (state) => {
+			const bunPrice = state.bun ? state.bun.price * 2 : 0;
+			const fillingsPrice = state.fillings.reduce(
+				(sum, item) => sum + item.price,
+				0
+			);
+			state.totalPrice = bunPrice + fillingsPrice;
+		},
+	},
+});
+
+export const {
+	addIngredient,
+	removeFilling,
+	moveFilling,
+	clearConstructor,
+	setIngredients,
+} = burgerConstructorSlice.actions;
+
+export default burgerConstructorSlice.reducer;

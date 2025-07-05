@@ -4,7 +4,8 @@
 	flex-direction: column;
 	align-items: center;
 	text-align: center;
-	cursor: pointer;
+	cursor: grab;
+	transition: all 0.2s ease;
 }
 
 .image {
@@ -23,4 +24,18 @@
 .name {
 	min-height: 48px;
 	margin: 0;
+}
+
+.dragging {
+	transform: rotate(5deg);
+	opacity: 0.5;
+}
+
+.card:hover {
+	box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
+	transform: translateY(-2px);
+}
+
+.card:active {
+	cursor: grabbing;
 }
