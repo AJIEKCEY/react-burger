@@ -34,8 +34,17 @@ export interface IBurgerConstructorState {
 	totalPrice: number;
 }
 
+//Состояние модального окна
+export interface IModalState {
+	ingredientDetails: {
+		isOpen: boolean;
+		ingredient: TIngredient | null;
+	};
+}
+
 export interface IInitialState {
 	burgerIngredients: IBurgerIngredientsState;
 	burgerConstructor: IBurgerConstructorState;
+	modal: IModalState;
 	// Здесь можно добавить другие состояния для других слайсов
 }

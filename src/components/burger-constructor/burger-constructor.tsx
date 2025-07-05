@@ -12,12 +12,12 @@ import {
 import { useBurgerConstructor } from '@hooks/use-burger-constructor';
 
 type TBurgerConstructorProps = {
-	ingredients: TIngredient[];
+	ingredients?: TIngredient[];
 	onOrderClick?: () => void;
 };
 
 export const BurgerConstructor = ({
-	ingredients,
+	ingredients = [] as TIngredient[],
 	onOrderClick = () => {},
 }: TBurgerConstructorProps): React.JSX.Element => {
 	const {

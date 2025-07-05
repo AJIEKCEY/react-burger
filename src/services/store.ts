@@ -2,24 +2,21 @@ import { initialState } from './initial-state';
 
 import burgerIngredientsSlice from '@services/reducers/burger-ingredients';
 import burgerConstructorReducer from '@services/reducers/burger-constructor';
-//import { customMiddleware } from "./middleware/custom-middleware"
 import { combineSlices, configureStore as createStore } from '@reduxjs/toolkit';
-//import { tasksApi } from './tasks/api.js';
 import type { Reducer } from '@reduxjs/toolkit';
 import type { IInitialState } from '@/types/types';
+import modalSlice from '@services/reducers/ingredient-modal.ts';
 
 const rootReducer: Reducer<IInitialState> = combineSlices({
 	burgerIngredients: burgerIngredientsSlice,
 	burgerConstructor: burgerConstructorReducer,
+	modal: modalSlice,
 });
 
 export const configureStore = () => {
 	return createStore({
 		reducer: rootReducer,
 		preloadedState: initialState,
-		// middleware: (getDefaultMiddleware) => {
-		// 	return getDefaultMiddleware({}).concat(tasksApi.middleware);
-		// },
 	});
 };
 

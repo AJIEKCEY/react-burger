@@ -8,6 +8,14 @@
 	transition: all 0.2s ease;
 }
 
+.infoIcon {
+	position: absolute;
+	top: 0;
+	left: 10px;
+	padding: 10px;
+	cursor: pointer;
+}
+
 .image {
 	width: 240px;
 	height: 120px;

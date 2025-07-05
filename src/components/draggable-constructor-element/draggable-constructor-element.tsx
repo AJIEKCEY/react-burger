@@ -21,9 +21,14 @@ type TDraggableConstructorElementProps = {
 	onRemove: () => void;
 };
 
-// Типизируем возвращаемое значение от collect
-interface TCollectedProps {
+// Типизируем возвращаемое значение от collect для useDrop
+interface TDropCollectedProps {
 	handlerId: string | symbol | null;
+}
+
+// Типизируем возвращаемое значение от collect для useDrag
+interface TDragCollectedProps {
+	isDragging: boolean;
 }
 
 export const DraggableConstructorElement = ({
@@ -34,7 +39,7 @@ export const DraggableConstructorElement = ({
 }: TDraggableConstructorElementProps): React.JSX.Element => {
 	const ref = useRef<HTMLDivElement>(null);
 
-	const [{ handlerId }, drop] = useDrop<TDragItem, void, TCollectedProps>({
+	const [{ handlerId }, drop] = useDrop<TDragItem, void, TDropCollectedProps>({
 		accept: DND_TYPES.CONSTRUCTOR_INGREDIENT,
 		collect(monitor) {
 			return {
@@ -89,10 +94,14 @@ export const DraggableConstructorElement = ({
 		},
 	});
 
-	const [{ isDragging }, drag] = useDrag({
+	const [{ isDragging }, drag] = useDrag<TDragItem, void, TDragCollectedProps>({
 		type: DND_TYPES.CONSTRUCTOR_INGREDIENT,
 		item: () => {
-			return { id: ingredient.constructorId, index };
+			return {
+				id: ingredient.constructorId,
+				index,
+				type: DND_TYPES.CONSTRUCTOR_INGREDIENT,
+			};
 		},
 		collect: (monitor) => ({
 			isDragging: monitor.isDragging(),
