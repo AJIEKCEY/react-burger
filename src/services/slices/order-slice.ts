@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { createOrder } from '../actions/order';
 import { IOrderState } from '@/types/types';
-import { createOrder } from '@services/actions/order';
 
 const initialState: IOrderState = {
 	orderNumber: null,

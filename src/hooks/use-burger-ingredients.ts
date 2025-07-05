@@ -1,17 +1,15 @@
 import { useCallback, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useThrottle } from '@hooks/useThrottle.ts';
+import { useAppDispatch, useAppSelector } from '@hooks/redux';
+import { useThrottle } from '@hooks/use-throttle';
 import {
 	setActiveTab,
 	setActiveTabFromScroll,
-} from '@services/reducers/burger-ingredients';
-import { IInitialState, TIngredientCategory } from '@/types/types';
+} from '@services/slices/burger-ingredients-slice';
+import { TIngredientCategory } from '@/types/types';
 
 export const useBurgerIngredients = () => {
-	const dispatch = useDispatch();
-	const { activeTab } = useSelector(
-		(state: IInitialState) => state.burgerIngredients
-	);
+	const dispatch = useAppDispatch();
+	const { activeTab } = useAppSelector((state) => state.burgerIngredients);
 
 	// Рефы для секций ингредиентов
 	const bunRef = useRef<HTMLDivElement>(null);

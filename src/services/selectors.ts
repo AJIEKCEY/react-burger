@@ -20,12 +20,3 @@ export const selectIngredientCounts = createSelector(
 		return counts;
 	}
 );
-
-// Селектор для получения количества конкретного ингредиента
-export const selectIngredientCount = createSelector(
-	[
-		selectIngredientCounts,
-		(_state: RootState, ingredientId: string) => ingredientId,
-	],
-	(counts, ingredientId) => counts[ingredientId] || 0
-);

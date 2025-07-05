@@ -68,9 +68,15 @@ export interface IModalState {
 	};
 }
 
-export interface IInitialState {
-	burgerIngredients: IBurgerIngredientsState;
-	burgerConstructor: IBurgerConstructorState;
-	modal: IModalState;
-	// Здесь можно добавить другие состояния для других слайсов
-}
+// RootState теперь импортируется из store.ts
+import { RootState } from '@services/store';
+export type { RootState };
+
+// Типы для Redux экшенов и тулкита
+export type TActionCreator<T> = (payload: T) => { type: string; payload: T };
+export type TThunkAction<R = void> = import('@reduxjs/toolkit').ThunkAction<
+	Promise<R>,
+	RootState,
+	unknown,
+	import('@reduxjs/toolkit').AnyAction
+>;

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@hooks/redux';
 import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
 import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
 import { AppHeader } from '@components/app-header/app-header';
@@ -9,15 +9,11 @@ import { IngredientDetails } from '@components/ingredient-details/ingredient-det
 import { OrderDetails } from '@components/order-details/order-details';
 import { Preloader } from '@components/preloader/preloader';
 import { fetchIngredients } from '@services/actions/burger-ingredients';
-import type { AppDispatch } from '@services/store';
-import type { IInitialState } from '@/types/types';
 import styles from './app.module.css';
 
 export const App = (): React.JSX.Element => {
-	const dispatch = useDispatch<AppDispatch>();
-	const { loading, error } = useSelector(
-		(state: IInitialState) => state.burgerIngredients
-	);
+	const dispatch = useAppDispatch();
+	const { loading, error } = useAppSelector((state) => state.burgerIngredients);
 
 	const { ingredientModal, orderModal, closeIngredientModal, closeOrderModal } =
 		useModal();

@@ -13,15 +13,15 @@ const initialState: IModalState = {
 	},
 };
 
-export const modalSlice = createSlice({
+const modalSlice = createSlice({
 	name: 'modal',
 	initialState,
 	reducers: {
-		openIngredientDetails: (state, action: PayloadAction<TIngredient>) => {
+		openIngredientModal: (state, action: PayloadAction<TIngredient>) => {
 			state.ingredientDetails.isOpen = true;
 			state.ingredientDetails.ingredient = action.payload;
 		},
-		closeIngredientDetails: (state) => {
+		closeIngredientModal: (state) => {
 			state.ingredientDetails.isOpen = false;
 			state.ingredientDetails.ingredient = null;
 		},
@@ -42,8 +42,8 @@ export const modalSlice = createSlice({
 });
 
 export const {
-	openIngredientDetails,
-	closeIngredientDetails,
+	openIngredientModal,
+	closeIngredientModal,
 	openOrderModal,
 	closeOrderModal,
 } = modalSlice.actions;

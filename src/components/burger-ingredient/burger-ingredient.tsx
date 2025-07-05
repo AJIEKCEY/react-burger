@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import styles from './burger-ingredient.module.css';
 import { TIngredient } from '@/types/types';
 import { useDrag } from 'react-dnd';
@@ -11,48 +11,24 @@ import {
 
 type TBurgerIngredientProps = {
 	ingredient: TIngredient;
-	//count?: number;
 	onIngredientClick?: (ingredient: TIngredient) => void;
 };
-
-// Типизируем возвращаемое значение от collect для useDrag
-interface TDragCollectedProps {
-	isDragging: boolean;
-}
 
 export const BurgerIngredient = ({
 	ingredient,
 	onIngredientClick,
 }: TBurgerIngredientProps): React.JSX.Element => {
 	const count = useIngredientCount(ingredient._id);
-	const dragStartedRef = useRef(false);
-
-	const [{ isDragging }, dragRef] = useDrag<
-		TIngredient,
-		void,
-		TDragCollectedProps
-	>({
+	const [{ isDragging }, dragRef] = useDrag({
 		type: DND_TYPES.INGREDIENT,
 		item: ingredient,
 		collect: (monitor) => ({
 			isDragging: monitor.isDragging(),
 		}),
-		// begin: () => {
-		// 	// Отмечаем начало перетаскивания
-		// 	dragStartedRef.current = true;
-		// },
-		end: () => {
-			// Сбрасываем флаг после завершения перетаскивания
-			setTimeout(() => {
-				dragStartedRef.current = false;
-			}, 100); // Небольшая задержка для предотвращения срабатывания onClick
-		},
 	});
 
-	const handleMouseUp = () => {
-		// Открываем модальное окно только если не было перетаскивания
-		if (!dragStartedRef.current && !isDragging) {
-			console.log('Opening modal for:', ingredient.name); // Отладка
+	const handleClick = () => {
+		if (!isDragging) {
 			onIngredientClick?.(ingredient);
 		}
 	};
@@ -61,7 +37,7 @@ export const BurgerIngredient = ({
 		<article
 			ref={dragRef}
 			className={`${styles.card} ${isDragging ? styles.dragging : ''}`}
-			onMouseUp={handleMouseUp}>
+			onClick={handleClick}>
 			<img
 				src={ingredient.image}
 				alt={ingredient.name}

@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '@hooks/redux';
 import { BurgerIngredientTabs } from '@components/burger-ingredients-tabs/burger-ingredients-tabs';
 import { IngredientSection } from '@components/burger-ingredients-section/burger-ingredients-section';
-import { useBurgerIngredients } from '@hooks/use-burger-ingredients.ts';
+import { useBurgerIngredients } from '@hooks/use-burger-ingredients';
 import { useModal } from '@hooks/use-modal';
-import { IInitialState, TIngredient } from '@/types/types';
+import { TIngredient } from '@/types/types';
 import styles from './burger-ingredients.module.css';
 
 export const BurgerIngredients = (): React.JSX.Element => {
-	const { items, loading, error } = useSelector(
-		(state: IInitialState) => state.burgerIngredients
+	const { items, loading, error } = useAppSelector(
+		(state) => state.burgerIngredients
 	);
 	const { activeTab, handleTabClick, handleScroll, containerRef, sectionRefs } =
 		useBurgerIngredients();
@@ -33,7 +33,6 @@ export const BurgerIngredients = (): React.JSX.Element => {
 	}, [handleScroll]);
 
 	const handleIngredientClick = (ingredient: TIngredient) => {
-		console.log('BurgerIngredients: opening modal for:', ingredient.name); // Отладка
 		openIngredientModal(ingredient);
 	};
 

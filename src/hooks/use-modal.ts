@@ -1,10 +1,10 @@
 import { useAppDispatch, useAppSelector } from './redux';
 import {
-	openIngredientDetails,
-	closeIngredientDetails,
+	openIngredientModal,
+	closeIngredientModal,
 	openOrderModal,
 	closeOrderModal,
-} from '@services/reducers/ingredient-modal';
+} from '@services/slices/modal-slice';
 import { TIngredient } from '@/types/types';
 
 export const useModal = () => {
@@ -14,11 +14,11 @@ export const useModal = () => {
 	);
 
 	const handleOpenIngredientModal = (ingredient: TIngredient) => {
-		dispatch(openIngredientDetails(ingredient));
+		dispatch(openIngredientModal(ingredient));
 	};
 
 	const handleCloseIngredientModal = () => {
-		dispatch(closeIngredientDetails());
+		dispatch(closeIngredientModal());
 	};
 
 	const handleOpenOrderModal = (orderNumber: number, orderName: string) => {

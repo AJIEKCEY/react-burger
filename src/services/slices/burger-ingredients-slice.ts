@@ -1,18 +1,25 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { fetchIngredients } from '@services/actions/burger-ingredients.ts';
-import { initialBurgerIngredientsState } from '@services/initial-state.ts';
-import type { TIngredientCategory } from '@/types/types';
+import { fetchIngredients } from '../actions/burger-ingredients';
+import {
+	IBurgerIngredientsState,
+	TIngredient,
+	TIngredientCategory,
+} from '@/types/types';
 
-// Создаем slice с помощью RTK
+const initialState: IBurgerIngredientsState = {
+	items: [],
+	loading: false,
+	error: null,
+	activeTab: 'bun',
+};
+
 const burgerIngredientsSlice = createSlice({
 	name: 'burgerIngredients',
-	initialState: initialBurgerIngredientsState,
+	initialState,
 	reducers: {
-		// Здесь будут редьюсеры
 		setActiveTab: (state, action: PayloadAction<TIngredientCategory>) => {
 			state.activeTab = action.payload;
 		},
-		// Добавляем action для автоматического переключения таба при прокрутке
 		setActiveTabFromScroll: (
 			state,
 			action: PayloadAction<TIngredientCategory>
@@ -21,19 +28,22 @@ const burgerIngredientsSlice = createSlice({
 		},
 	},
 	extraReducers: (builder) => {
-		// Здесь будут обработчики async actions
 		builder
 			.addCase(fetchIngredients.pending, (state) => {
 				state.loading = true;
 				state.error = null;
 			})
-			.addCase(fetchIngredients.fulfilled, (state, action) => {
-				state.loading = false;
-				state.items = action.payload;
-			})
+			.addCase(
+				fetchIngredients.fulfilled,
+				(state, action: PayloadAction<TIngredient[]>) => {
+					state.loading = false;
+					state.items = action.payload;
+					state.error = null;
+				}
+			)
 			.addCase(fetchIngredients.rejected, (state, action) => {
 				state.loading = false;
-				state.error = action.payload as string;
+				state.error = action.payload || 'Ошибка загрузки ингредиентов';
 			});
 	},
 });

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDrop } from 'react-dnd';
 import { DND_TYPES } from '@/constants/dnd';
 import { TIngredient } from '@/types/types';
@@ -11,19 +11,12 @@ import {
 } from '@ya.praktikum/react-developer-burger-ui-components';
 import { useBurgerConstructor } from '@hooks/use-burger-constructor';
 
-type TBurgerConstructorProps = {
-	ingredients?: TIngredient[];
-};
-
-export const BurgerConstructor = ({
-	ingredients = [] as TIngredient[],
-}: TBurgerConstructorProps): React.JSX.Element => {
+export const BurgerConstructor = (): React.JSX.Element => {
 	const {
 		bun,
 		fillings,
 		totalPrice,
 		orderLoading,
-		handleSetIngredients,
 		handleOrderClick,
 		handleRemoveFilling,
 		handleAddIngredient,
@@ -31,6 +24,8 @@ export const BurgerConstructor = ({
 	} = useBurgerConstructor();
 
 	// Drop zone для всего конструктора
+	const isOrderDisabled = !bun || fillings.length === 0 || orderLoading;
+
 	const [{ isOver, canDrop }, dropRef] = useDrop({
 		accept: DND_TYPES.INGREDIENT,
 		drop: (item: TIngredient) => {
@@ -41,12 +36,6 @@ export const BurgerConstructor = ({
 			canDrop: monitor.canDrop(),
 		}),
 	});
-
-	useEffect(() => {
-		if (ingredients && ingredients.length > 0) {
-			handleSetIngredients(ingredients);
-		}
-	}, [ingredients, handleSetIngredients]);
 
 	return (
 		<section className={`${styles.burger_constructor} pt-25`}>
@@ -77,11 +66,9 @@ export const BurgerConstructor = ({
 							))
 						) : (
 							<div className={styles.emptyFillings}>
-								<div className={styles.placeholder}>
-									<span className='text text_type_main-default text_color_inactive'>
-										Перетащите ингредиенты сюда
-									</span>
-								</div>
+								<span className='text text_type_main-default text_color_inactive'>
+									Перетащите ингредиенты сюда
+								</span>
 							</div>
 						)}
 					</div>
@@ -111,7 +98,7 @@ export const BurgerConstructor = ({
 					type='primary'
 					size='large'
 					onClick={handleOrderClick}
-					disabled={!bun || fillings.length === 0 || orderLoading}>
+					disabled={isOrderDisabled}>
 					{orderLoading ? 'Оформление...' : 'Оформить заказ'}
 				</Button>
 			</div>

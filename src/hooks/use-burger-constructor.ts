@@ -6,9 +6,9 @@ import {
 	moveFilling,
 	clearConstructor,
 	setIngredients,
-} from '@services/reducers/burger-constructor';
+} from '@services/slices/burger-constructor-slice';
 import { createOrder } from '@services/actions/order';
-import { clearOrder } from '@services/reducers/order';
+import { clearOrder } from '@services/slices/order-slice';
 import { useModal } from '@hooks/use-modal';
 import { TIngredient } from '@/types/types';
 
