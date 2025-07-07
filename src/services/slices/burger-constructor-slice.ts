@@ -11,27 +11,49 @@ const initialState: IBurgerConstructorState = {
 	totalPrice: 0,
 };
 
+const calculateTotalPrice = (state: IBurgerConstructorState) => {
+	const bunPrice = state.bun ? state.bun.price * 2 : 0;
+	const fillingsPrice = state.fillings.reduce(
+		(sum, item) => sum + item.price,
+		0
+	);
+	state.totalPrice = bunPrice + fillingsPrice;
+};
+
 const burgerConstructorSlice = createSlice({
 	name: 'burgerConstructor',
 	initialState,
 	reducers: {
 		// Добавление ингредиента (универсальное действие для DnD)
-		addIngredient: (state, action: PayloadAction<TIngredient>) => {
-			const ingredient = action.payload;
+		addIngredient: {
+			reducer: (
+				state,
+				action: PayloadAction<TIngredient | TConstructorIngredient>
+			) => {
+				const ingredient = action.payload;
 
-			if (ingredient.type === 'bun') {
-				// Заменяем булочку
-				state.bun = ingredient;
-			} else {
-				// Добавляем начинку
-				const newFilling: TConstructorIngredient = {
-					...ingredient,
-					constructorId: nanoid(),
-				};
-				state.fillings.push(newFilling);
-			}
+				if (ingredient.type === 'bun') {
+					// Заменяем булочку
+					state.bun = ingredient as TIngredient;
+				} else {
+					// Добавляем начинку
+					state.fillings.push(ingredient as TConstructorIngredient);
+				}
 
-			burgerConstructorSlice.caseReducers.calculateTotalPrice(state);
+				calculateTotalPrice(state);
+			},
+			prepare: (ingredient: TIngredient) => {
+				// Генерируем constructorId для начинки в prepare
+				if (ingredient.type !== 'bun') {
+					return {
+						payload: {
+							...ingredient,
+							constructorId: nanoid(),
+						} as TConstructorIngredient,
+					};
+				}
+				return { payload: ingredient };
+			},
 		},
 
 		// Удаление начинки по constructorId
@@ -39,7 +61,7 @@ const burgerConstructorSlice = createSlice({
 			state.fillings = state.fillings.filter(
 				(item) => item.constructorId !== action.payload
 			);
-			burgerConstructorSlice.caseReducers.calculateTotalPrice(state);
+			calculateTotalPrice(state);
 		},
 
 		// Перемещение начинки (для сортировки)
@@ -84,32 +106,33 @@ const burgerConstructorSlice = createSlice({
 		},
 
 		// Установка ингредиентов из массива (для совместимости с текущим API)
-		setIngredients: (state, action: PayloadAction<TIngredient[]>) => {
-			const ingredients = action.payload;
+		setIngredients: {
+			reducer: (
+				state,
+				action: PayloadAction<(TIngredient | TConstructorIngredient)[]>
+			) => {
+				const ingredients = action.payload;
 
-			// Находим булочку
-			const foundBun = ingredients.find((item) => item.type === 'bun');
-			state.bun = foundBun || null;
+				// Находим булочку
+				const foundBun = ingredients.find((item) => item.type === 'bun');
+				state.bun = foundBun ? (foundBun as TIngredient) : null;
 
-			// Находим начинки и добавляем им constructorId
-			state.fillings = ingredients
-				.filter((item) => item.type !== 'bun')
-				.map((item) => ({
-					...item,
-					constructorId: nanoid(),
-				}));
+				// Находим начинки
+				state.fillings = ingredients.filter(
+					(item) => item.type !== 'bun'
+				) as TConstructorIngredient[];
 
-			burgerConstructorSlice.caseReducers.calculateTotalPrice(state);
-		},
-
-		// Внутренний reducer для расчета общей стоимости
-		calculateTotalPrice: (state) => {
-			const bunPrice = state.bun ? state.bun.price * 2 : 0;
-			const fillingsPrice = state.fillings.reduce(
-				(sum, item) => sum + item.price,
-				0
-			);
-			state.totalPrice = bunPrice + fillingsPrice;
+				calculateTotalPrice(state);
+			},
+			prepare: (ingredients: TIngredient[]) => {
+				// Генерируем constructorId для начинок в prepare
+				const preparedIngredients = ingredients.map((item) =>
+					item.type === 'bun'
+						? item
+						: ({ ...item, constructorId: nanoid() } as TConstructorIngredient)
+				);
+				return { payload: preparedIngredients };
+			},
 		},
 	},
 });
