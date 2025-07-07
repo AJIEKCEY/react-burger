@@ -1,0 +1,19 @@
+.ingredients_group {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 24px 32px;
+	box-sizing: border-box;
+	width: 100%;
+	margin-bottom: 40px;
+}
+
+.ingredients_group > * {
+	box-sizing: border-box;
+	width: 100%;
+}
+
+.ingredients_group h2 {
+	grid-column: 1 / -1;
+	margin: 0;
+	padding: 0;
+}
