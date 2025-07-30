@@ -1,6 +1,9 @@
 import React from 'react';
 import styles from './burger-ingredient.module.css';
-import { TIngredient } from '@utils/types.ts';
+import { TIngredient } from '@/types/types';
+import { useDrag } from 'react-dnd';
+import { DND_TYPES } from '@/constants/dnd';
+import { useIngredientCount } from '@hooks/use-ingredient-count';
 import {
 	Counter,
 	CurrencyIcon,
@@ -12,13 +15,29 @@ type TBurgerIngredientProps = {
 };
 
 export const BurgerIngredient = ({
-	onIngredientClick,
 	ingredient,
+	onIngredientClick,
 }: TBurgerIngredientProps): React.JSX.Element => {
+	const count = useIngredientCount(ingredient._id);
+	const [{ isDragging }, dragRef] = useDrag({
+		type: DND_TYPES.INGREDIENT,
+		item: ingredient,
+		collect: (monitor) => ({
+			isDragging: monitor.isDragging(),
+		}),
+	});
+
+	const handleClick = () => {
+		if (!isDragging) {
+			onIngredientClick?.(ingredient);
+		}
+	};
+
 	return (
 		<article
-			className={styles.card}
-			onClick={() => onIngredientClick?.(ingredient)}>
+			ref={dragRef}
+			className={`${styles.card} ${isDragging ? styles.dragging : ''}`}
+			onClick={handleClick}>
 			<img
 				src={ingredient.image}
 				alt={ingredient.name}
@@ -33,7 +52,7 @@ export const BurgerIngredient = ({
 			<p className={`${styles.name} text text_type_main-default`}>
 				{ingredient.name}
 			</p>
-			<Counter count={1} size='default' />
+			{count > 0 && <Counter count={count} size='default' />}
 		</article>
 	);
 };
