@@ -1,69 +1,36 @@
-import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '@hooks/redux';
-import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
-import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+	HomePage,
+	LoginPage,
+	RegisterPage,
+	ForgotPasswordPage,
+	ResetPasswordPage,
+	ProfilePage,
+	IngredientPage,
+	NotFoundPage,
+} from '@/pages';
 import { AppHeader } from '@components/app-header/app-header';
-import { Modal } from '@components/modal/modal';
-import { useModal } from '@hooks/use-modal';
-import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
-import { OrderDetails } from '@components/order-details/order-details';
-import { Preloader } from '@components/preloader/preloader';
-import { fetchIngredients } from '@services/actions/burger-ingredients';
 import styles from './app.module.css';
 import '@/styles/global.css';
 
 export const App = (): React.JSX.Element => {
-	const dispatch = useAppDispatch();
-	const { loading, error } = useAppSelector((state) => state.burgerIngredients);
-
-	const { ingredientModal, orderModal, closeIngredientModal, closeOrderModal } =
-		useModal();
-
-	useEffect(() => {
-		dispatch(fetchIngredients());
-	}, [dispatch]);
-
 	return (
-		<div className={styles.app}>
-			<AppHeader />
-			<h1
-				className={`${styles.title} text text_type_main-large mt-10 mb-5 pl-5`}>
-				Соберите бургер
-			</h1>
-			<main className={`${styles.main} pl-5 pr-5`}>
-				{loading ? (
-					<div className={styles.loaderContainer}>
-						<Preloader />
-					</div>
-				) : error ? (
-					<div className={styles.errorContainer}>
-						<p className='text text_type_main-medium text_color_error'>
-							Ошибка загрузки данных. Попробуйте обновить страницу.
-						</p>
-					</div>
-				) : (
-					<BurgerIngredients />
-				)}
-				<BurgerConstructor />
-			</main>
-
-			{ingredientModal?.isOpen && (
-				<Modal onClose={closeIngredientModal} title='Детали ингредиента'>
-					{ingredientModal.ingredient && (
-						<IngredientDetails ingredient={ingredientModal.ingredient} />
-					)}
-				</Modal>
-			)}
-
-			{/* Модальное окно заказа */}
-			{orderModal?.isOpen && (
-				<Modal onClose={closeOrderModal}>
-					<OrderDetails
-						orderNumber={orderModal.orderNumber!}
-						orderName={orderModal.orderName!}
-					/>
-				</Modal>
-			)}
-		</div>
+		<Router>
+			<div className={styles.app}>
+				<AppHeader />
+				<Routes>
+					<Route path='/' element={<HomePage />} />
+					<Route path='/login' element={<LoginPage />} />
+					<Route path='/register' element={<RegisterPage />} />
+					<Route path='/forgot-password' element={<ForgotPasswordPage />} />
+					<Route path='/reset-password' element={<ResetPasswordPage />} />
+					<Route path='/profile' element={<ProfilePage />} />
+					<Route path='/ingredients/:id' element={<IngredientPage />} />
+					{/* Catch-all route для 404 */}
+					<Route path='*' element={<NotFoundPage />} />
+				</Routes>
+			</div>
+		</Router>
 	);
 };
