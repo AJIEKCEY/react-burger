@@ -99,7 +99,7 @@ export const useBurgerIngredients = () => {
 			// Увеличиваем время ожидания для гарантии завершения анимации
 			setTimeout(() => setIsUserScrolling(true), 800);
 		},
-		[dispatch]
+		[dispatch, sectionRefs]
 	);
 
 	return {
