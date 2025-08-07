@@ -30,7 +30,7 @@ export const BurgerIngredients = (): React.JSX.Element => {
 			container.addEventListener('scroll', handleScroll);
 			return () => container.removeEventListener('scroll', handleScroll);
 		}
-	}, [handleScroll]);
+	}, [containerRef, handleScroll]);
 
 	const handleIngredientClick = (ingredient: TIngredient) => {
 		openIngredientModal(ingredient);

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './burger-ingredient.module.css';
 import { TIngredient } from '@/types/types';
 import { useDrag } from 'react-dnd';
@@ -11,14 +12,15 @@ import {
 
 type TBurgerIngredientProps = {
 	ingredient: TIngredient;
-	onIngredientClick?: (ingredient: TIngredient) => void;
 };
 
 export const BurgerIngredient = ({
 	ingredient,
-	onIngredientClick,
 }: TBurgerIngredientProps): React.JSX.Element => {
+	const location = useLocation();
+	const navigate = useNavigate();
 	const count = useIngredientCount(ingredient._id);
+
 	const [{ isDragging }, dragRef] = useDrag({
 		type: DND_TYPES.INGREDIENT,
 		item: ingredient,
@@ -29,7 +31,10 @@ export const BurgerIngredient = ({
 
 	const handleClick = () => {
 		if (!isDragging) {
-			onIngredientClick?.(ingredient);
+			// Открываем модальное окно и устанавливаем маршрут
+			navigate(`/ingredients/${ingredient._id}`, {
+				state: { background: location },
+			});
 		}
 	};
 

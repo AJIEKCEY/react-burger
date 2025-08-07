@@ -1,82 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	Input,
 	EmailInput,
 	PasswordInput,
 	Button,
 } from '@ya.praktikum/react-developer-burger-ui-components';
-import { Link, useNavigate } from 'react-router-dom';
-import { apiRequest } from '@/utils/api';
-import { API_ENDPOINTS } from '@/constants/api';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '@hooks/redux';
+import { registerUser } from '@services/actions/auth';
+import { clearError } from '@services/slices/auth-slice';
+import {
+	selectAuthLoading,
+	selectAuthError,
+	selectIsAuthenticated,
+} from '@services/selectors';
+import { LocationWithState } from '@/types/types';
 
 import styles from './register.module.css';
 
-interface RegisterResponse {
-	success: boolean;
-	user: {
-		email: string;
-		name: string;
-	};
-	accessToken: string;
-	refreshToken: string;
-	message?: string;
-}
-
-export const RegisterPage: React.FC = () => {
+export const RegisterPage = (): React.JSX.Element => {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+
+	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
+	const location = useLocation() as LocationWithState;
+
+	const isLoading = useAppSelector(selectAuthLoading);
+	const error = useAppSelector(selectAuthError);
+	const isAuthenticated = useAppSelector(selectIsAuthenticated);
+
+	// Редирект если пользователь уже авторизован
+	useEffect(() => {
+		if (isAuthenticated) {
+			navigate('/', { replace: true });
+		}
+	}, [isAuthenticated, navigate]);
+
+	// Очищаем ошибку при размонтировании компонента
+	useEffect(() => {
+		return () => {
+			if (error) {
+				dispatch(clearError());
+			}
+		};
+	}, [dispatch, error]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+
 		if (!name.trim() || !email.trim() || !password.trim()) {
-			setError('Пожалуйста, заполните все поля');
 			return;
 		}
 
-		setIsLoading(true);
-		setError(null);
-
 		try {
-			const response = await apiRequest<RegisterResponse>(
-				API_ENDPOINTS.REGISTER,
-				{
-					method: 'POST',
-					body: JSON.stringify({
-						email,
-						password,
-						name,
-					}),
-				}
-			);
-
-			console.log('Registration successful:', response);
-			// Сохраняем токены в localStorage
-			if (response.accessToken && response.refreshToken) {
-				// Убираем префикс "Bearer " если он есть
-				const accessToken = response.accessToken.replace('Bearer ', '');
-
-				localStorage.setItem('accessToken', accessToken);
-				localStorage.setItem('refreshToken', response.refreshToken);
-			}
-
-			// Сохраняем информацию о пользователе
-			if (response.user) {
-				localStorage.setItem('user', JSON.stringify(response.user));
-			}
-
-			// Редирект на главную страницу
-			navigate('/', { replace: true });
+			await dispatch(registerUser({ email, password, name })).unwrap();
+			// Перенаправляем на страницу, с которой пришел пользователь, или на главную
+			const redirectTo = location.state?.from?.pathname || '/';
+			navigate(redirectTo, { replace: true });
 		} catch (err) {
-			console.error('Registration error:', err);
-			setError(
-				err instanceof Error ? err.message : 'Произошла ошибка при регистрации'
-			);
-		} finally {
-			setIsLoading(false);
+			// Ошибка уже обработана в slice
 		}
 	};
 
@@ -119,7 +103,9 @@ export const RegisterPage: React.FC = () => {
 					type='primary'
 					size='medium'
 					extraClass='mb-20'
-					disabled={isLoading}>
+					disabled={
+						isLoading || !name.trim() || !email.trim() || !password.trim()
+					}>
 					{isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
 				</Button>
 				<div className={styles.footerLinks}>

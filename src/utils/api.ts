@@ -1,4 +1,5 @@
 import { API_CONFIG } from '@/constants/api.ts';
+import { tokenService } from '@/services/token-service';
 
 const API_URL = API_CONFIG.BASE_URL;
 
@@ -29,6 +30,7 @@ export const apiRequest = async <T>(
 	options: RequestInit = {}
 ): Promise<T> => {
 	const url = `${API_URL}${endpoint}`;
+	const authHeader = tokenService.getAuthHeader();
 
 	// Устанавливаем базовые заголовки
 	const defaultHeaders = {
@@ -39,6 +41,7 @@ export const apiRequest = async <T>(
 		...options,
 		headers: {
 			...defaultHeaders,
+			...(authHeader && { Authorization: authHeader }),
 			...options.headers,
 		},
 	};

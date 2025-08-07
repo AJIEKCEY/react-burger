@@ -1,77 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	EmailInput,
 	PasswordInput,
 	Button,
 } from '@ya.praktikum/react-developer-burger-ui-components';
-import { Link, useNavigate } from 'react-router-dom';
-import { apiRequest } from '@/utils/api';
-import { API_ENDPOINTS } from '@/constants/api';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '@hooks/redux';
+import { loginUser } from '@services/actions/auth';
+import { clearError } from '@services/slices/auth-slice';
+import {
+	selectAuthLoading,
+	selectAuthError,
+	selectIsAuthenticated,
+} from '@services/selectors';
+import { LocationWithState } from '@/types/types';
 
 import styles from './login.module.css';
 
-interface LoginResponse {
-	success: boolean;
-	user: {
-		email: string;
-		name: string;
-	};
-	accessToken: string;
-	refreshToken: string;
-	message?: string;
-}
-
-export const LoginPage: React.FC = () => {
+export const LoginPage = (): React.JSX.Element => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+
+	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
+	const location = useLocation() as LocationWithState;
+
+	const isLoading = useAppSelector(selectAuthLoading);
+	const error = useAppSelector(selectAuthError);
+	const isAuthenticated = useAppSelector(selectIsAuthenticated);
+
+	// Редирект если пользователь уже авторизован
+	useEffect(() => {
+		if (isAuthenticated) {
+			navigate('/', { replace: true });
+		}
+	}, [isAuthenticated, navigate]);
+
+	// Очищаем ошибку при размонтировании компонента
+	useEffect(() => {
+		return () => {
+			if (error) {
+				dispatch(clearError());
+			}
+		};
+	}, [dispatch, error]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+
 		if (!email.trim() || !password.trim()) {
-			setError('Пожалуйста, заполните все поля');
 			return;
 		}
 
-		setIsLoading(true);
-		setError(null);
-
 		try {
-			const response = await apiRequest<LoginResponse>(API_ENDPOINTS.LOGIN, {
-				method: 'POST',
-				body: JSON.stringify({
-					email,
-					password,
-				}),
-			});
-
-			console.log('Login successful:', response);
-
-			// Сохраняем токены в localStorage
-			if (response.accessToken && response.refreshToken) {
-				// Убираем префикс "Bearer " если он есть
-				const accessToken = response.accessToken.replace('Bearer ', '');
-
-				localStorage.setItem('accessToken', accessToken);
-				localStorage.setItem('refreshToken', response.refreshToken);
-			}
-
-			// Сохраняем информацию о пользователе
-			if (response.user) {
-				localStorage.setItem('user', JSON.stringify(response.user));
-			}
-
-			// Редирект на главную страницу
-			navigate('/', { replace: true });
+			await dispatch(loginUser({ email, password })).unwrap();
+			// Перенаправляем на страницу, с которой пришел пользователь, или на главную
+			const redirectTo = location.state?.from?.pathname || '/';
+			navigate(redirectTo, { replace: true });
 		} catch (err) {
-			console.error('Login error:', err);
-			setError(
-				err instanceof Error ? err.message : 'Произошла ошибка при входе'
-			);
-		} finally {
-			setIsLoading(false);
+			// Ошибка уже обработана в slice
 		}
 	};
 
@@ -105,7 +92,7 @@ export const LoginPage: React.FC = () => {
 					type='primary'
 					size='medium'
 					extraClass='mb-20'
-					disabled={isLoading}>
+					disabled={isLoading || !email.trim() || !password.trim()}>
 					{isLoading ? 'Вход...' : 'Войти'}
 				</Button>
 				<div className={styles.footerLinks}>

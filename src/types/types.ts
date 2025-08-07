@@ -1,3 +1,14 @@
+import { Location } from 'react-router-dom';
+
+// Определяем тип для custom state
+export interface CustomLocationState {
+	background?: Location;
+	from?: Location;
+}
+
+// Используем дженерик Location
+export type LocationWithState = Location<CustomLocationState>;
+
 export type TIngredientCategory = 'bun' | 'sauce' | 'main';
 
 export type TIngredient = {

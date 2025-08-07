@@ -1,136 +1,228 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	Input,
 	EmailInput,
 	PasswordInput,
 	Button,
 } from '@ya.praktikum/react-developer-burger-ui-components';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '@hooks/redux';
+import { getUser, updateUser } from '@services/actions/user';
+import { logoutUser } from '@services/actions/auth';
+import { clearUserError } from '@services/slices/user-slice';
+import {
+	selectUser,
+	selectAuthLoading,
+	selectUserLoading,
+	selectUserUpdating,
+	selectUserError,
+} from '@services/selectors';
+
+import { useNavigate } from 'react-router-dom';
 import styles from './profile.module.css';
 
 export const ProfilePage: React.FC = () => {
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [isEdited, setIsEdited] = useState(false);
+	const [originalData, setOriginalData] = useState({ name: '', email: '' });
+	const [isEditing, setIsEditing] = useState(false);
+
+	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 
-	// Отслеживаем изменения в полях
-	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setName(e.target.value);
-		setIsEdited(true);
-	};
+	const user = useAppSelector(selectUser);
+	const authLoading = useAppSelector(selectAuthLoading);
+	const userLoading = useAppSelector(selectUserLoading);
+	const isUpdating = useAppSelector(selectUserUpdating);
+	const error = useAppSelector(selectUserError);
 
-	const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setEmail(e.target.value);
-		setIsEdited(true);
-	};
+	// Загружаем данные пользователя при монтировании
+	useEffect(() => {
+		dispatch(getUser());
+	}, [dispatch]);
 
-	const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setPassword(e.target.value);
-		setIsEdited(true);
-	};
+	// Обновляем поля при получении данных пользователя
+	useEffect(() => {
+		if (user) {
+			setName(user.name);
+			setEmail(user.email);
+			setOriginalData({ name: user.name, email: user.email });
+		}
+	}, [user]);
 
-	const handleSubmit = (e: React.FormEvent) => {
+	// Очищаем ошибки при размонтировании
+	useEffect(() => {
+		return () => {
+			dispatch(clearUserError());
+		};
+	}, [dispatch]);
+
+	// Проверяем, есть ли изменения
+	const hasChanges =
+		name !== originalData.name ||
+		email !== originalData.email ||
+		password.length > 0;
+
+	// Сохранение изменений
+	const handleSave = async (e: React.FormEvent) => {
 		e.preventDefault();
-		// Здесь будет логика сохранения данных профиля
-		console.log('Saving profile data:', { name, email, password });
-		setIsEdited(false);
+
+		if (!hasChanges) return;
+
+		const updateData: { name?: string; email?: string; password?: string } = {};
+
+		if (name !== originalData.name) {
+			updateData.name = name;
+		}
+		if (email !== originalData.email) {
+			updateData.email = email;
+		}
+		if (password.length > 0) {
+			updateData.password = password;
+		}
+
+		try {
+			await dispatch(updateUser(updateData)).unwrap();
+			setPassword('');
+			setIsEditing(false);
+		} catch (err) {
+			// Ошибка уже обработана в slice
+		}
 	};
 
+	// Отмена изменений
 	const handleCancel = () => {
-		// Сброс полей к исходным значениям
-		setName('');
-		setEmail('');
+		setName(originalData.name);
+		setEmail(originalData.email);
 		setPassword('');
-		setIsEdited(false);
+		setIsEditing(false);
+		dispatch(clearUserError());
 	};
 
-	const handleLogout = () => {
-		// Здесь будет логика выхода из системы
-		console.log('Logging out...');
-		navigate('/login');
+	// Выход из системы
+	const handleLogout = async () => {
+		try {
+			await dispatch(logoutUser()).unwrap();
+			navigate('/login', { replace: true });
+		} catch (err) {
+			// В случае ошибки все равно перенаправляем на логин
+			navigate('/login', { replace: true });
+		}
 	};
+
+	// Активация режима редактирования
+	const handleEdit = () => {
+		setIsEditing(true);
+	};
+
+	const isLoading = userLoading || authLoading;
+
+	if (isLoading && !user) {
+		return (
+			<main className={styles.wrapper}>
+				<div className={styles.container}>
+					<p className='text text_type_main-medium'>Загрузка...</p>
+				</div>
+			</main>
+		);
+	}
 
 	return (
 		<main className={styles.wrapper}>
 			<div className={styles.container}>
-				<nav className={styles.sidebar}>
-					<ul className={styles.menu}>
-						<li className={styles.menuItem}>
-							<NavLink
-								to='/profile'
-								className={({ isActive }) =>
-									`${styles.menuLink} text text_type_main-medium ${
-										isActive ? styles.active : 'text_color_inactive'
-									}`
-								}>
-								Профиль
-							</NavLink>
-						</li>
-						<li className={styles.menuItem}>
-							<NavLink
-								to='/profile/orders'
-								className={({ isActive }) =>
-									`${styles.menuLink} text text_type_main-medium ${
-										isActive ? styles.active : 'text_color_inactive'
-									}`
-								}>
+				<div className={styles.sidebar}>
+					<nav>
+						<button
+							className={`${styles.navButton} ${styles.active}`}
+							type='button'>
+							<span className='text text_type_main-medium'>Профиль</span>
+						</button>
+						<button className={styles.navButton} type='button'>
+							<span className='text text_type_main-medium text_color_inactive'>
 								История заказов
-							</NavLink>
-						</li>
-						<li className={styles.menuItem}>
-							<button
-								className={`${styles.menuLink} ${styles.logoutButton} text text_type_main-medium text_color_inactive`}
-								onClick={handleLogout}>
+							</span>
+						</button>
+						<button
+							className={styles.navButton}
+							type='button'
+							onClick={handleLogout}
+							disabled={isLoading}>
+							<span className='text text_type_main-medium text_color_inactive'>
 								Выход
-							</button>
-						</li>
-					</ul>
-					<p
-						className={`${styles.description} text text_type_main-default text_color_inactive mt-20`}>
+							</span>
+						</button>
+					</nav>
+					<p className='text text_type_main-default text_color_inactive mt-20'>
 						В этом разделе вы можете изменить свои персональные данные
 					</p>
-				</nav>
+				</div>
 
 				<div className={styles.content}>
-					<form className={styles.form} onSubmit={handleSubmit}>
+					<form className={styles.form} onSubmit={handleSave}>
+						{error && (
+							<div
+								className='text text_type_main-default mb-4'
+								style={{ color: 'red' }}>
+								{error}
+							</div>
+						)}
+
 						<Input
 							type='text'
 							placeholder='Имя'
 							value={name}
 							name='name'
-							onChange={handleNameChange}
-							icon='EditIcon'
+							onChange={(e) => {
+								setName(e.target.value);
+								setIsEditing(true);
+							}}
+							icon={isEditing ? undefined : 'EditIcon'}
+							disabled={isLoading}
+							onIconClick={handleEdit}
 							extraClass='mb-6'
 						/>
+
 						<EmailInput
 							value={email}
 							name='email'
-							placeholder='Логин'
-							onChange={handleEmailChange}
-							isIcon={true}
+							onChange={(e) => {
+								setEmail(e.target.value);
+								setIsEditing(true);
+							}}
+							isIcon={!isEditing}
+							disabled={isLoading}
 							extraClass='mb-6'
 						/>
+
 						<PasswordInput
 							value={password}
 							name='password'
+							onChange={(e) => {
+								setPassword(e.target.value);
+								setIsEditing(true);
+							}}
+							icon={isEditing ? 'ShowIcon' : 'EditIcon'}
+							disabled={isLoading}
 							placeholder='Пароль'
-							onChange={handlePasswordChange}
-							icon='EditIcon'
 							extraClass='mb-6'
 						/>
-						{isEdited && (
+
+						{isEditing && hasChanges && (
 							<div className={styles.buttons}>
 								<Button
 									htmlType='button'
 									type='secondary'
 									size='medium'
-									onClick={handleCancel}>
+									onClick={handleCancel}
+									disabled={isUpdating}>
 									Отмена
 								</Button>
-								<Button htmlType='submit' type='primary' size='medium'>
-									Сохранить
+								<Button
+									htmlType='submit'
+									type='primary'
+									size='medium'
+									disabled={isUpdating}>
+									{isUpdating ? 'Сохранение...' : 'Сохранить'}
 								</Button>
 							</div>
 						)}

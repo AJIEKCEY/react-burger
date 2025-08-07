@@ -1,8 +1,9 @@
-.title {
-	text-align: left;
+.main {
+	display: flex;
+	justify-content: center;
 }
 
-.main {
+.container {
 	display: flex;
 	gap: 40px;
 }
