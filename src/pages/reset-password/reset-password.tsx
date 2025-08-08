@@ -9,6 +9,7 @@ import { apiRequest } from '@/utils/api';
 import { API_ENDPOINTS } from '@/constants/api';
 
 import styles from './reset-password.module.css';
+import { ErrorMessage } from '@components/error-message/error-message.tsx';
 
 interface ResetPasswordResponse {
 	success: boolean;
@@ -66,13 +67,7 @@ export const ResetPasswordPage: React.FC = () => {
 				<h1 className='text text_type_main-medium mb-6'>
 					Восстановление пароля
 				</h1>
-				{error && (
-					<div
-						className='text text_type_main-default mb-4'
-						style={{ color: 'red' }}>
-						{error}
-					</div>
-				)}
+				<ErrorMessage error={error} />
 				<PasswordInput
 					value={password}
 					name='password'

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@hooks/redux';
 import {
 	selectIngredients,
@@ -7,17 +7,14 @@ import {
 } from '@services/selectors';
 import { fetchIngredients } from '@services/actions/burger-ingredients';
 import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
-import { useModal } from '@hooks/use-modal';
 import styles from './ingredient.module.css';
 
 export const IngredientPage: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
-	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 
 	const ingredients = useAppSelector(selectIngredients);
 	const loading = useAppSelector(selectIngredientsLoading);
-	const { openIngredientModal, ingredientModal } = useModal();
 
 	useEffect(() => {
 		// Если ингредиенты еще не загружены, загружаем их
@@ -25,31 +22,6 @@ export const IngredientPage: React.FC = () => {
 			dispatch(fetchIngredients());
 		}
 	}, [dispatch, ingredients.length]);
-
-	useEffect(() => {
-		// Когда ингредиенты загружены, находим нужный и устанавливаем в модальное состояние
-		if (ingredients.length > 0 && id) {
-			const ingredient = ingredients.find((item) => item._id === id);
-			if (ingredient) {
-				// Только если ингредиент еще не установлен в модальном состоянии
-				if (
-					!ingredientModal.ingredient ||
-					ingredientModal.ingredient._id !== id
-				) {
-					openIngredientModal(ingredient);
-				}
-			} else {
-				// Ингредиент не найден, перенаправляем на 404
-				navigate('*', { replace: true });
-			}
-		}
-	}, [
-		ingredients,
-		id,
-		openIngredientModal,
-		navigate,
-		ingredientModal.ingredient,
-	]);
 
 	if (loading) {
 		return (

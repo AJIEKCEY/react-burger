@@ -9,16 +9,19 @@ import {
 } from '@services/slices/burger-constructor-slice';
 import { createOrder } from '@services/actions/order';
 import { clearOrder } from '@services/slices/order-slice';
-import { useModal } from '@hooks/use-modal';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 import { TIngredient } from '@/types/types';
 
 export const useBurgerConstructor = () => {
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
+	const location = useLocation();
+
 	const { bun, fillings, totalPrice } = useAppSelector(
 		(state) => state.burgerConstructor
 	);
 	const { loading: orderLoading } = useAppSelector((state) => state.order);
-	const { openOrderModal } = useModal();
 
 	const handleAddIngredient = useCallback(
 		(ingredient: TIngredient) => {
@@ -66,18 +69,18 @@ export const useBurgerConstructor = () => {
 			// Создаем заказ
 			const result = await dispatch(
 				createOrder({ ingredients: ingredientIds })
-			);
+			).unwrap();
 
-			if (createOrder.fulfilled.match(result)) {
-				// Открываем модальное окно с деталями заказа
-				openOrderModal(result.payload.order.number, result.payload.name);
-				// Очищаем конструктор после успешного заказа
-				handleClearConstructor();
-			}
+			// Переходим на URL с модалкой заказа
+			navigate(`/orders/${result.order.number}`, {
+				state: { background: location },
+			});
+
+			handleClearConstructor();
 		} catch (error) {
 			console.error('Ошибка при создании заказа:', error);
 		}
-	}, [bun, fillings, dispatch, openOrderModal, handleClearConstructor]);
+	}, [bun, fillings, dispatch, navigate, location, handleClearConstructor]);
 
 	const handleClearOrder = useCallback(() => {
 		dispatch(clearOrder());

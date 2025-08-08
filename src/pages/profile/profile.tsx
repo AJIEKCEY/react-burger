@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/redux';
 import { getUser, updateUser } from '@services/actions/user';
 import { logoutUser } from '@services/actions/auth';
 import { clearUserError } from '@services/slices/user-slice';
+import { ErrorMessage } from '@components/error-message/error-message';
 import {
 	selectUser,
 	selectAuthLoading,
@@ -159,14 +160,7 @@ export const ProfilePage: React.FC = () => {
 
 				<div className={styles.content}>
 					<form className={styles.form} onSubmit={handleSave}>
-						{error && (
-							<div
-								className='text text_type_main-default mb-4'
-								style={{ color: 'red' }}>
-								{error}
-							</div>
-						)}
-
+						<ErrorMessage error={error} />
 						<Input
 							type='text'
 							placeholder='Имя'

@@ -66,19 +66,6 @@ export interface IOrderState {
 	error: string | null;
 }
 
-//Состояние модального окна
-export interface IModalState {
-	ingredientDetails: {
-		isOpen: boolean;
-		ingredient: TIngredient | null;
-	};
-	orderDetails: {
-		isOpen: boolean;
-		orderNumber: number | null;
-		orderName: string | null;
-	};
-}
-
 // RootState теперь импортируется из store.ts
 import { RootState } from '@services/store';
 export type { RootState };

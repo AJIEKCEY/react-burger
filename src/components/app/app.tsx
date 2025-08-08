@@ -25,6 +25,7 @@ import { IngredientDetails } from '@components/ingredient-details/ingredient-det
 import { ProtectedRouteElement } from '@components/protected-route/protected-route';
 
 import '@/styles/global.css';
+import { OrderDetails } from '@components/order-details/order-details.tsx';
 
 const AppRoutes: React.FC = () => {
 	const location = useLocation();
@@ -93,6 +94,7 @@ const AppRoutes: React.FC = () => {
 			{background && (
 				<Routes>
 					<Route path='/ingredients/:id' element={<IngredientModalWrapper />} />
+					<Route path='/orders/:number' element={<OrderModalWrapper />} />
 				</Routes>
 			)}
 		</>
@@ -121,6 +123,31 @@ const IngredientModalWrapper: React.FC = () => {
 	return (
 		<Modal title='Детали ингредиента' onClose={handleCloseModal}>
 			<IngredientDetails ingredient={ingredient} />
+		</Modal>
+	);
+};
+
+// Добавить компонент OrderModalWrapper:
+const OrderModalWrapper: React.FC = () => {
+	const location = useLocation();
+	const navigate = useNavigate();
+	const background = location.state?.background;
+
+	// Получаем данные заказа из Redux состояния
+	const { orderNumber, orderName } = useAppSelector((state) => state.order);
+
+	const handleCloseModal = () => {
+		navigate(background || '/', { replace: true });
+	};
+
+	// Проверяем, что данные заказа есть
+	if (!orderNumber || !orderName) {
+		return null;
+	}
+
+	return (
+		<Modal title='Заказ оформлен' onClose={handleCloseModal}>
+			<OrderDetails orderNumber={orderNumber} orderName={orderName} />
 		</Modal>
 	);
 };

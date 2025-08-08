@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAppSelector } from '@hooks/redux';
+import { Loader } from '@components/loader/loader';
 import {
 	selectIsAuthenticated,
 	selectIsAuthChecked,
@@ -21,17 +22,7 @@ export const ProtectedRouteElement: React.FC<ProtectedRouteElementProps> = ({
 
 	// Пока идет проверка авторизации, показываем загрузку
 	if (!isAuthChecked) {
-		return (
-			<div
-				style={{
-					display: 'flex',
-					justifyContent: 'center',
-					alignItems: 'center',
-					height: '100vh',
-				}}>
-				<p className='text text_type_main-medium'>Загрузка...</p>
-			</div>
-		);
+		return <Loader text='Проверка авторизации...' />;
 	}
 
 	// Если маршрут только для неавторизованных пользователей (anonymous=true)

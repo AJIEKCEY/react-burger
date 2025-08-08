@@ -24,12 +24,6 @@ export const selectIngredientsLoading = (state: RootState) =>
 export const selectIngredientsError = (state: RootState) =>
 	state.burgerIngredients.error;
 
-// Селекторы для модального окна
-export const selectModalState = (state: RootState) => state.modal;
-export const selectIngredientModal = (state: RootState) =>
-	state.modal.ingredientDetails;
-export const selectOrderModal = (state: RootState) => state.modal.orderDetails;
-
 // Селектор для получения количества каждого ингредиента в конструкторе
 export const selectIngredientCounts = createSelector(
 	[(state: RootState) => state.burgerConstructor],
