@@ -45,7 +45,12 @@ export const ForgotPasswordPage: React.FC = () => {
 			console.log('Password reset email sent:', response);
 
 			// При успешном запросе перенаправляем на страницу reset-password
-			navigate('/reset-password', { replace: true });
+			navigate('/reset-password', {
+				state: {
+					canResetPassword: true,
+				},
+				replace: true,
+			});
 		} catch (err) {
 			console.error('Forgot password error:', err);
 			setError(

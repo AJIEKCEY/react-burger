@@ -1,11 +1,11 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAppSelector } from '@hooks/redux';
-import { Loader } from '@components/loader/loader';
+import { useAppSelector } from '@hooks/redux.ts';
+import { Loader } from '@components/loader/loader.tsx';
 import {
 	selectIsAuthenticated,
 	selectIsAuthChecked,
-} from '@services/selectors';
+} from '@services/selectors.ts';
 
 interface ProtectedRouteElementProps {
 	element: React.ReactElement;
