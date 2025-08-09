@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
 	Input,
 	EmailInput,
@@ -8,33 +8,49 @@ import {
 import { Link } from 'react-router-dom';
 import { registerUser } from '@services/actions/auth';
 import { useAuthForm } from '@hooks/use-auth-form';
+import { useForm } from '@hooks/use-form';
 import { ErrorMessage } from '@components/error-message/error-message';
 
 import styles from './register.module.css';
 
 export const RegisterPage = (): React.JSX.Element => {
-	const [name, setName] = useState('');
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
+	const { values, handleChange } = useForm({
+		name: '',
+		email: '',
+		password: '',
+	});
 
 	const { isLoading, error, handleAuthSuccess, dispatch } = useAuthForm();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!name.trim() || !email.trim() || !password.trim()) {
+		if (
+			!values.name.trim() ||
+			!values.email.trim() ||
+			!values.password.trim()
+		) {
 			return;
 		}
 
 		try {
-			await dispatch(registerUser({ email, password, name })).unwrap();
+			await dispatch(
+				registerUser({
+					name: values.name,
+					email: values.email,
+					password: values.password,
+				})
+			).unwrap();
+
 			handleAuthSuccess();
 		} catch (err) {
 			// Ошибка уже обработана в slice
 		}
 	};
 
-	const isFormValid = name.trim() && email.trim() && password.trim();
+	// Проверяем, заполнены ли все поля
+	const isFormFilled =
+		values.name.trim() && values.email.trim() && values.password.trim();
 
 	return (
 		<main className={styles.wrapper}>
@@ -44,23 +60,23 @@ export const RegisterPage = (): React.JSX.Element => {
 				<Input
 					type='text'
 					placeholder='Имя'
-					value={name}
+					value={values.name}
 					name='name'
-					onChange={(e) => setName(e.target.value)}
+					onChange={handleChange}
 					extraClass='mb-6'
 					disabled={isLoading}
 				/>
 				<EmailInput
-					value={email}
+					value={values.email}
 					name='email'
-					onChange={(e) => setEmail(e.target.value)}
+					onChange={handleChange}
 					extraClass='mb-6'
 					isIcon={false}
 				/>
 				<PasswordInput
-					value={password}
+					value={values.password}
 					name='password'
-					onChange={(e) => setPassword(e.target.value)}
+					onChange={handleChange}
 					extraClass='mb-6'
 					icon='ShowIcon'
 				/>
@@ -69,7 +85,7 @@ export const RegisterPage = (): React.JSX.Element => {
 					type='primary'
 					size='medium'
 					extraClass='mb-20'
-					disabled={isLoading || !isFormValid}>
+					disabled={isLoading || !isFormFilled}>
 					{isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
 				</Button>
 				<div className={styles.footerLinks}>

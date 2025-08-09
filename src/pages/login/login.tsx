@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
 	EmailInput,
 	PasswordInput,
@@ -7,47 +7,60 @@ import {
 import { Link } from 'react-router-dom';
 import { loginUser } from '@services/actions/auth';
 import { useAuthForm } from '@hooks/use-auth-form';
+import { useForm } from '@hooks/use-form';
 import { ErrorMessage } from '@components/error-message/error-message';
 
 import styles from './login.module.css';
 
 export const LoginPage = (): React.JSX.Element => {
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
+	const { values, handleChange } = useForm({
+		email: '',
+		password: '',
+	});
 
 	const { isLoading, error, handleAuthSuccess, dispatch } = useAuthForm();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!email.trim() || !password.trim()) {
+		// Простая проверка заполненности
+		if (!values.email.trim() || !values.password.trim()) {
 			return;
 		}
 
 		try {
-			await dispatch(loginUser({ email, password })).unwrap();
+			await dispatch(
+				loginUser({
+					email: values.email,
+					password: values.password,
+				})
+			).unwrap();
 			handleAuthSuccess();
 		} catch (err) {
 			// Ошибка уже обработана в slice
 		}
 	};
 
+	// Проверяем, заполнены ли поля
+	const isFormFilled = values.email.trim() && values.password.trim();
+
 	return (
 		<main className={styles.wrapper}>
 			<form className={styles.form} onSubmit={handleSubmit}>
 				<h1 className='text text_type_main-medium mb-6'>Вход</h1>
 				<ErrorMessage error={error} />
+
 				<EmailInput
-					value={email}
+					value={values.email}
 					name='email'
-					onChange={(e) => setEmail(e.target.value)}
+					onChange={handleChange}
 					extraClass='mb-6'
 					isIcon={false}
 				/>
 				<PasswordInput
-					value={password}
+					value={values.password}
 					name='password'
-					onChange={(e) => setPassword(e.target.value)}
+					onChange={handleChange}
 					extraClass='mb-6'
 					icon='ShowIcon'
 				/>
@@ -56,7 +69,7 @@ export const LoginPage = (): React.JSX.Element => {
 					type='primary'
 					size='medium'
 					extraClass='mb-20'
-					disabled={isLoading || !email.trim() || !password.trim()}>
+					disabled={isLoading || !isFormFilled}>
 					{isLoading ? 'Вход...' : 'Войти'}
 				</Button>
 				<div className={styles.footerLinks}>

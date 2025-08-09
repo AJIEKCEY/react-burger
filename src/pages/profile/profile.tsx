@@ -10,6 +10,7 @@ import { getUser, updateUser } from '@services/actions/user';
 import { logoutUser } from '@services/actions/auth';
 import { clearUserError } from '@services/slices/user-slice';
 import { ErrorMessage } from '@components/error-message/error-message';
+import { useForm } from '@hooks/use-form';
 import {
 	selectUser,
 	selectAuthLoading,
@@ -17,15 +18,16 @@ import {
 	selectUserUpdating,
 	selectUserError,
 } from '@services/selectors';
-
 import { useNavigate } from 'react-router-dom';
+
 import styles from './profile.module.css';
 
 export const ProfilePage: React.FC = () => {
-	const [name, setName] = useState('');
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [originalData, setOriginalData] = useState({ name: '', email: '' });
+	const { values, handleChange, setValues } = useForm({
+		name: '',
+		email: '',
+		password: '',
+	});
 	const [isEditing, setIsEditing] = useState(false);
 
 	const dispatch = useAppDispatch();
@@ -45,11 +47,13 @@ export const ProfilePage: React.FC = () => {
 	// Обновляем поля при получении данных пользователя
 	useEffect(() => {
 		if (user) {
-			setName(user.name);
-			setEmail(user.email);
-			setOriginalData({ name: user.name, email: user.email });
+			setValues({
+				name: user.name,
+				email: user.email,
+				password: '',
+			});
 		}
-	}, [user]);
+	}, [user, setValues]);
 
 	// Очищаем ошибки при размонтировании
 	useEffect(() => {
@@ -58,11 +62,12 @@ export const ProfilePage: React.FC = () => {
 		};
 	}, [dispatch]);
 
-	// Проверяем, есть ли изменения
+	// Проверяем, есть ли изменения (сравниваем с исходными данными пользователя)
 	const hasChanges =
-		name !== originalData.name ||
-		email !== originalData.email ||
-		password.length > 0;
+		user &&
+		(values.name !== user.name ||
+			values.email !== user.email ||
+			values.password.trim().length > 0);
 
 	// Сохранение изменений
 	const handleSave = async (e: React.FormEvent) => {
@@ -72,19 +77,22 @@ export const ProfilePage: React.FC = () => {
 
 		const updateData: { name?: string; email?: string; password?: string } = {};
 
-		if (name !== originalData.name) {
-			updateData.name = name;
-		}
-		if (email !== originalData.email) {
-			updateData.email = email;
-		}
-		if (password.length > 0) {
-			updateData.password = password;
+		if (user) {
+			if (values.name !== user.name) {
+				updateData.name = values.name;
+			}
+			if (values.email !== user.email) {
+				updateData.email = values.email;
+			}
+			if (values.password.trim().length > 0) {
+				updateData.password = values.password;
+			}
 		}
 
 		try {
 			await dispatch(updateUser(updateData)).unwrap();
-			setPassword('');
+			// Очищаем пароль после успешного сохранения
+			setValues((prev) => ({ ...prev, password: '' }));
 			setIsEditing(false);
 		} catch (err) {
 			// Ошибка уже обработана в slice
@@ -93,9 +101,13 @@ export const ProfilePage: React.FC = () => {
 
 	// Отмена изменений
 	const handleCancel = () => {
-		setName(originalData.name);
-		setEmail(originalData.email);
-		setPassword('');
+		if (user) {
+			setValues({
+				name: user.name,
+				email: user.email,
+				password: '',
+			});
+		}
 		setIsEditing(false);
 		dispatch(clearUserError());
 	};
@@ -164,10 +176,10 @@ export const ProfilePage: React.FC = () => {
 						<Input
 							type='text'
 							placeholder='Имя'
-							value={name}
+							value={values.name}
 							name='name'
 							onChange={(e) => {
-								setName(e.target.value);
+								handleChange(e);
 								setIsEditing(true);
 							}}
 							icon={isEditing ? undefined : 'EditIcon'}
@@ -177,10 +189,10 @@ export const ProfilePage: React.FC = () => {
 						/>
 
 						<EmailInput
-							value={email}
+							value={values.email}
 							name='email'
 							onChange={(e) => {
-								setEmail(e.target.value);
+								handleChange(e);
 								setIsEditing(true);
 							}}
 							isIcon={!isEditing}
@@ -189,10 +201,10 @@ export const ProfilePage: React.FC = () => {
 						/>
 
 						<PasswordInput
-							value={password}
+							value={values.password}
 							name='password'
 							onChange={(e) => {
-								setPassword(e.target.value);
+								handleChange(e);
 								setIsEditing(true);
 							}}
 							icon={isEditing ? 'ShowIcon' : 'EditIcon'}
