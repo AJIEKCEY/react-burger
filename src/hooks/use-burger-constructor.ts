@@ -10,6 +10,7 @@ import {
 import { createOrder } from '@services/actions/order';
 import { clearOrder } from '@services/slices/order-slice';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { selectIsAuthenticated } from '@services/selectors';
 
 import { TIngredient } from '@/types/types';
 
@@ -17,6 +18,8 @@ export const useBurgerConstructor = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const location = useLocation();
+
+	const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
 	const { bun, fillings, totalPrice } = useAppSelector(
 		(state) => state.burgerConstructor
@@ -58,6 +61,20 @@ export const useBurgerConstructor = () => {
 	const handleOrderClick = useCallback(async () => {
 		if (!bun || fillings.length === 0) return;
 
+		// Проверяем авторизацию перед отправкой заказа
+		if (!isAuthenticated) {
+			// Перенаправляем на страницу логина с сохранением текущего состояния
+			navigate('/login', {
+				state: {
+					from: location,
+					// Сохраняем информацию о том, что пользователь хотел сделать заказ
+					orderIntent: true,
+				},
+				replace: false,
+			});
+			return;
+		}
+
 		// Собираем массив ID ингредиентов для заказа
 		const ingredientIds = [
 			bun._id, // Булка снизу
@@ -80,7 +97,15 @@ export const useBurgerConstructor = () => {
 		} catch (error) {
 			console.error('Ошибка при создании заказа:', error);
 		}
-	}, [bun, fillings, dispatch, navigate, location, handleClearConstructor]);
+	}, [
+		bun,
+		fillings,
+		isAuthenticated,
+		navigate,
+		location,
+		dispatch,
+		handleClearConstructor,
+	]);
 
 	const handleClearOrder = useCallback(() => {
 		dispatch(clearOrder());

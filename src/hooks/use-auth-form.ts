@@ -31,10 +31,9 @@ export const useAuthForm = (): UseAuthFormReturn => {
 	// Редирект если пользователь уже авторизован
 	useEffect(() => {
 		if (isAuthenticated) {
-			const redirectTo = location.state?.from?.pathname || '/';
-			navigate(redirectTo, { replace: true });
+			handleAuthSuccess();
 		}
-	}, [isAuthenticated, navigate, location]);
+	}, [isAuthenticated]);
 
 	// Очищаем ошибку при размонтировании компонента
 	useEffect(() => {
@@ -45,10 +44,22 @@ export const useAuthForm = (): UseAuthFormReturn => {
 		};
 	}, [dispatch, error]);
 
-	// Функция для обработки успешной авторизации
+	/// Функция для обработки успешной авторизации
 	const handleAuthSuccess = () => {
-		const redirectTo = location.state?.from?.pathname || '/';
-		navigate(redirectTo, { replace: true });
+		const fromLocation = location.state?.from;
+
+		// Если пользователь пришел с намерением сделать заказ
+		if (location.state?.orderIntent && fromLocation) {
+			// Возвращаем на страницу с заказом и автоматически отправляем заказ
+			navigate(fromLocation.pathname || '/', {
+				replace: true,
+				state: { ...fromLocation.state, autoSubmitOrder: true },
+			});
+		} else {
+			// Обычный редирект
+			const redirectTo = fromLocation?.pathname || '/';
+			navigate(redirectTo, { replace: true });
+		}
 	};
 
 	return {

@@ -4,6 +4,8 @@ import { Location } from 'react-router-dom';
 export interface CustomLocationState {
 	background?: Location;
 	from?: Location;
+	orderIntent?: boolean;
+	autoSubmitOrder?: boolean;
 }
 
 // Используем дженерик Location
