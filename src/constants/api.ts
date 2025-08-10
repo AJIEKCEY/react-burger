@@ -1,6 +1,14 @@
 export const API_ENDPOINTS = {
 	INGREDIENTS: '/ingredients',
 	ORDERS: '/orders',
+	REGISTER: '/auth/register',
+	LOGIN: '/auth/login',
+	LOGOUT: '/auth/logout',
+	TOKEN: '/auth/token',
+	USER: '/auth/user',
+	FORGOT_PASSWORD: '/password-reset',
+	RESET_PASSWORD: '/password-reset/reset',
+	//PROFILE: '/profile',
 } as const;
 
 export const API_CONFIG = {

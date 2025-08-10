@@ -1,3 +1,17 @@
+import { Location } from 'react-router-dom';
+
+// Определяем тип для custom state
+export interface CustomLocationState {
+	background?: Location;
+	from?: Location;
+	orderIntent?: boolean;
+	autoSubmitOrder?: boolean;
+	canResetPassword?: boolean;
+}
+
+// Используем дженерик Location
+export type LocationWithState = Location<CustomLocationState>;
+
 export type TIngredientCategory = 'bun' | 'sauce' | 'main';
 
 export type TIngredient = {
@@ -53,19 +67,6 @@ export interface IOrderState {
 	orderName: string | null;
 	loading: boolean;
 	error: string | null;
-}
-
-//Состояние модального окна
-export interface IModalState {
-	ingredientDetails: {
-		isOpen: boolean;
-		ingredient: TIngredient | null;
-	};
-	orderDetails: {
-		isOpen: boolean;
-		orderNumber: number | null;
-		orderName: string | null;
-	};
 }
 
 // RootState теперь импортируется из store.ts

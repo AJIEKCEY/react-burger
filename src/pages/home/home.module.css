@@ -1,0 +1,24 @@
+.main {
+	display: flex;
+	justify-content: center;
+}
+
+.container {
+	display: flex;
+	gap: 40px;
+	padding: 40px 20px;
+}
+
+.loaderContainer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 400px;
+}
+
+.errorContainer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 400px;
+}

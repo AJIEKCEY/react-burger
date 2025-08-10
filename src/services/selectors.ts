@@ -1,6 +1,29 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '@/services/store';
 
+// Селекторы для пользователя
+export const selectUserLoading = (state: RootState) => state.user.isLoading;
+export const selectUserUpdating = (state: RootState) => state.user.isUpdating;
+export const selectUserError = (state: RootState) => state.user.error;
+
+// Селекторы для авторизации
+export const selectAuth = (state: RootState) => state.auth;
+export const selectUser = (state: RootState) => state.auth.user;
+export const selectIsAuthenticated = (state: RootState) =>
+	state.auth.isAuthenticated;
+export const selectAuthLoading = (state: RootState) => state.auth.isLoading;
+export const selectAuthError = (state: RootState) => state.auth.error;
+export const selectIsAuthChecked = (state: RootState) =>
+	state.auth.isAuthChecked;
+
+// Селекторы для ингредиентов
+export const selectIngredients = (state: RootState) =>
+	state.burgerIngredients.items;
+export const selectIngredientsLoading = (state: RootState) =>
+	state.burgerIngredients.loading;
+export const selectIngredientsError = (state: RootState) =>
+	state.burgerIngredients.error;
+
 // Селектор для получения количества каждого ингредиента в конструкторе
 export const selectIngredientCounts = createSelector(
 	[(state: RootState) => state.burgerConstructor],

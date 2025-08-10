@@ -1,0 +1,102 @@
+import React from 'react';
+import {
+	Input,
+	EmailInput,
+	PasswordInput,
+	Button,
+} from '@ya.praktikum/react-developer-burger-ui-components';
+import { Link } from 'react-router-dom';
+import { registerUser } from '@services/actions/auth';
+import { useAuthForm } from '@hooks/use-auth-form';
+import { useForm } from '@hooks/use-form';
+import { ErrorMessage } from '@components/error-message/error-message';
+
+import styles from './register.module.css';
+
+export const RegisterPage = (): React.JSX.Element => {
+	const { values, handleChange } = useForm({
+		name: '',
+		email: '',
+		password: '',
+	});
+
+	const { isLoading, error, handleAuthSuccess, dispatch } = useAuthForm();
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+
+		if (
+			!values.name.trim() ||
+			!values.email.trim() ||
+			!values.password.trim()
+		) {
+			return;
+		}
+
+		try {
+			await dispatch(
+				registerUser({
+					name: values.name,
+					email: values.email,
+					password: values.password,
+				})
+			).unwrap();
+
+			handleAuthSuccess();
+		} catch (err) {
+			// Ошибка уже обработана в slice
+		}
+	};
+
+	// Проверяем, заполнены ли все поля
+	const isFormFilled =
+		values.name.trim() && values.email.trim() && values.password.trim();
+
+	return (
+		<main className={styles.wrapper}>
+			<form className={styles.form} onSubmit={handleSubmit}>
+				<h1 className='text text_type_main-medium mb-6'>Регистрация</h1>
+				<ErrorMessage error={error} />
+				<Input
+					type='text'
+					placeholder='Имя'
+					value={values.name}
+					name='name'
+					onChange={handleChange}
+					extraClass='mb-6'
+					disabled={isLoading}
+				/>
+				<EmailInput
+					value={values.email}
+					name='email'
+					onChange={handleChange}
+					extraClass='mb-6'
+					isIcon={false}
+				/>
+				<PasswordInput
+					value={values.password}
+					name='password'
+					onChange={handleChange}
+					extraClass='mb-6'
+					icon='ShowIcon'
+				/>
+				<Button
+					htmlType='submit'
+					type='primary'
+					size='medium'
+					extraClass='mb-20'
+					disabled={isLoading || !isFormFilled}>
+					{isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
+				</Button>
+				<div className={styles.footerLinks}>
+					<p className='text text_type_main-default text_color_inactive'>
+						Уже зарегистрированы?{' '}
+						<Link to='/login' className={styles.link}>
+							Войти
+						</Link>
+					</p>
+				</div>
+			</form>
+		</main>
+	);
+};

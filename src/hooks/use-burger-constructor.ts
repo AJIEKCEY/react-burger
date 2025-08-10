@@ -9,16 +9,22 @@ import {
 } from '@services/slices/burger-constructor-slice';
 import { createOrder } from '@services/actions/order';
 import { clearOrder } from '@services/slices/order-slice';
-import { useModal } from '@hooks/use-modal';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { selectIsAuthenticated } from '@services/selectors';
+
 import { TIngredient } from '@/types/types';
 
 export const useBurgerConstructor = () => {
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
+	const location = useLocation();
+
+	const isAuthenticated = useAppSelector(selectIsAuthenticated);
+
 	const { bun, fillings, totalPrice } = useAppSelector(
 		(state) => state.burgerConstructor
 	);
 	const { loading: orderLoading } = useAppSelector((state) => state.order);
-	const { openOrderModal } = useModal();
 
 	const handleAddIngredient = useCallback(
 		(ingredient: TIngredient) => {
@@ -55,6 +61,20 @@ export const useBurgerConstructor = () => {
 	const handleOrderClick = useCallback(async () => {
 		if (!bun || fillings.length === 0) return;
 
+		// Проверяем авторизацию перед отправкой заказа
+		if (!isAuthenticated) {
+			// Перенаправляем на страницу логина с сохранением текущего состояния
+			navigate('/login', {
+				state: {
+					from: location,
+					// Сохраняем информацию о том, что пользователь хотел сделать заказ
+					orderIntent: true,
+				},
+				replace: false,
+			});
+			return;
+		}
+
 		// Собираем массив ID ингредиентов для заказа
 		const ingredientIds = [
 			bun._id, // Булка снизу
@@ -66,18 +86,26 @@ export const useBurgerConstructor = () => {
 			// Создаем заказ
 			const result = await dispatch(
 				createOrder({ ingredients: ingredientIds })
-			);
+			).unwrap();
 
-			if (createOrder.fulfilled.match(result)) {
-				// Открываем модальное окно с деталями заказа
-				openOrderModal(result.payload.order.number, result.payload.name);
-				// Очищаем конструктор после успешного заказа
-				handleClearConstructor();
-			}
+			// Переходим на URL с модалкой заказа
+			navigate(`/orders/${result.order.number}`, {
+				state: { background: location },
+			});
+
+			handleClearConstructor();
 		} catch (error) {
 			console.error('Ошибка при создании заказа:', error);
 		}
-	}, [bun, fillings, dispatch, openOrderModal, handleClearConstructor]);
+	}, [
+		bun,
+		fillings,
+		isAuthenticated,
+		navigate,
+		location,
+		dispatch,
+		handleClearConstructor,
+	]);
 
 	const handleClearOrder = useCallback(() => {
 		dispatch(clearOrder());

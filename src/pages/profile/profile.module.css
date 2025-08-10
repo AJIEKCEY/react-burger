@@ -1,0 +1,101 @@
+.wrapper {
+	min-height: calc(100vh - 88px);
+	padding: 120px 0;
+}
+
+.container {
+	display: flex;
+	gap: 120px;
+	max-width: 1240px;
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+.sidebar {
+	flex-shrink: 0;
+	width: 280px;
+}
+
+.menu {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.menuItem {
+	margin-bottom: 24px;
+}
+
+.menuLink {
+	display: block;
+	padding: 0;
+	font-family: inherit;
+	text-decoration: none;
+	background: none;
+	border: none;
+	cursor: pointer;
+	transition: color 0.3s ease;
+}
+
+.menuLink:hover {
+	color: #f2f2f3;
+}
+
+.navButton {
+	display: block;
+	padding: 10px 0;
+	color: #8585ad;
+	font-family: inherit;
+	text-decoration: none;
+	background: none;
+	border: none;
+	cursor: pointer;
+	transition: color 0.3s ease;
+}
+
+.navButton:hover {
+	color: #f2f2f3;
+}
+
+.active {
+	color: #f2f2f3 !important;
+}
+
+.logoutButton {
+	text-align: left;
+}
+
+.description {
+	max-width: 280px;
+}
+
+.content {
+	flex: 1;
+	max-width: 400px;
+}
+
+.form {
+	width: 100%;
+}
+
+.buttons {
+	display: flex;
+	justify-content: flex-end;
+	gap: 24px;
+	margin-top: 24px;
+}
+
+@media (width <= 768px) {
+	.container {
+		flex-direction: column;
+		gap: 40px;
+	}
+
+	.sidebar {
+		width: 100%;
+	}
+
+	.content {
+		max-width: 100%;
+	}
+}

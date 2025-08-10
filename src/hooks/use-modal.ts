@@ -5,13 +5,13 @@ import {
 	openOrderModal,
 	closeOrderModal,
 } from '@services/slices/modal-slice';
+import { selectIngredientModal, selectOrderModal } from '@services/selectors';
 import { TIngredient } from '@/types/types';
 
 export const useModal = () => {
 	const dispatch = useAppDispatch();
-	const { ingredientDetails, orderDetails } = useAppSelector(
-		(state) => state.modal
-	);
+	const ingredientModal = useAppSelector(selectIngredientModal);
+	const orderModal = useAppSelector(selectOrderModal);
 
 	const handleOpenIngredientModal = (ingredient: TIngredient) => {
 		dispatch(openIngredientModal(ingredient));
@@ -30,8 +30,8 @@ export const useModal = () => {
 	};
 
 	return {
-		ingredientModal: ingredientDetails,
-		orderModal: orderDetails,
+		ingredientModal,
+		orderModal,
 		openIngredientModal: handleOpenIngredientModal,
 		closeIngredientModal: handleCloseIngredientModal,
 		openOrderModal: handleOpenOrderModal,
