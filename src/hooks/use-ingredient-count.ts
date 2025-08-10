@@ -1,5 +1,5 @@
 import { useAppSelector } from './redux';
-import { selectIngredientCounts } from '@/services/selectors';
+import { selectIngredientCounts } from '@services/selectors';
 
 export const useIngredientCount = (ingredientId: string) => {
 	return useAppSelector((state) => {

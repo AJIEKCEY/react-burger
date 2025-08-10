@@ -1,5 +1,5 @@
 import { API_CONFIG } from '@/constants/api.ts';
-import { tokenService } from '@/services/token-service';
+import { tokenService } from '@services/token-service';
 
 const API_URL = API_CONFIG.BASE_URL;
 

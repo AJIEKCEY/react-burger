@@ -17,7 +17,7 @@ export const NotFoundPage: React.FC = () => {
 						перемещена
 					</p>
 					<Link to='/' className={styles.link}>
-						<Button type='primary' size='medium'>
+						<Button htmlType='button' size='medium'>
 							Вернуться на главную
 						</Button>
 					</Link>

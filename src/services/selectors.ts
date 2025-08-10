@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '@/services/store';
+import { RootState } from '@services/store';
 
 // Селекторы для пользователя
 export const selectUserLoading = (state: RootState) => state.user.isLoading;
