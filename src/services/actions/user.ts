@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { apiRequest } from '@/utils/api';
 import { API_ENDPOINTS } from '@/constants/api';
-import { tokenService } from '@/services/token-service';
+import { tokenService } from '@services/token-service';
 
 // Типы для запросов и ответов
 export interface UserResponse {

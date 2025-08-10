@@ -7,7 +7,7 @@ import {
 	Logo,
 } from '@ya.praktikum/react-developer-burger-ui-components';
 import { useAppDispatch, useAppSelector } from '@hooks/redux';
-import { logoutUser } from '@/services/actions/auth';
+import { logoutUser } from '@services/actions/auth';
 import { selectIsAuthenticated, selectUser } from '@services/selectors';
 
 import styles from './app-header.module.css';

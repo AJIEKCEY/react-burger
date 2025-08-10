@@ -7,7 +7,7 @@ import {
 	checkAuthUser,
 } from '../actions/auth';
 import { getUser, updateUser } from '../actions/user';
-import { tokenService } from '@/services/token-service';
+import { tokenService } from '@services/token-service';
 
 export interface User {
 	email: string;

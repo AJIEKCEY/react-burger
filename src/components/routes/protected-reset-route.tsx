@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { LocationWithState } from '@types/types.ts';
+import { LocationWithState } from '@/types/types.ts';
 
 interface ProtectedResetRouteProps {
 	element: React.ReactElement;
