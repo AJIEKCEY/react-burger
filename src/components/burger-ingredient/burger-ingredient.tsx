@@ -12,6 +12,7 @@ import {
 
 type TBurgerIngredientProps = {
 	ingredient: TIngredient;
+	onIngredientClick: (ingredient: TIngredient) => void;
 };
 
 export const BurgerIngredient = ({
