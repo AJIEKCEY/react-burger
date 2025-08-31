@@ -5,12 +5,14 @@ import orderReducer from './slices/order-slice';
 import authReducer from './slices/auth-slice';
 import userReducer from './slices/user-slice';
 import feedReducer from './slices/feed-slice';
+import singleOrderReducer from './slices/single-order-slice';
 
 const rootReducer = combineReducers({
 	feed: feedReducer,
 	burgerIngredients: burgerIngredientsSlice,
 	burgerConstructor: burgerConstructorSlice,
 	order: orderReducer,
+	singleOrder: singleOrderReducer,
 	auth: authReducer,
 	user: userReducer,
 });

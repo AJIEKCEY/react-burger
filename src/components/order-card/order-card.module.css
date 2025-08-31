@@ -18,6 +18,10 @@
 	align-items: center;
 }
 
+.content {
+	margin: 0;
+}
+
 .name {
 	margin: 0;
 }
@@ -28,6 +32,10 @@
 
 .statusDone {
 	color: #00cccc;
+}
+
+.statusPending {
+	color: #63ff2b;
 }
 
 .footer {

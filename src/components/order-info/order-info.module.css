@@ -1,0 +1,146 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	max-height: 70vh;
+}
+
+.header {
+	margin-bottom: 40px;
+	text-align: center;
+}
+
+.statusDone {
+	color: #00cccc !important;
+}
+
+.statusPending {
+	color: #4c4cff !important;
+}
+
+.composition {
+	margin-bottom: 40px;
+}
+
+.ingredientsList {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	max-height: 300px;
+	padding-right: 8px;
+	overflow-y: auto;
+}
+
+.ingredientsList::-webkit-scrollbar {
+	width: 6px;
+}
+
+.ingredientsList::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.ingredientsList::-webkit-scrollbar-thumb {
+	background: #4c4cff;
+	border-radius: 3px;
+}
+
+.ingredientsList::-webkit-scrollbar-thumb:hover {
+	background: #3333ff;
+}
+
+.ingredientItem {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+	padding: 8px 0;
+}
+
+.ingredientInfo {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: 16px;
+	min-width: 0;
+}
+
+.ingredientImage {
+	flex-shrink: 0;
+	width: 64px;
+	height: 64px;
+	overflow: hidden;
+	border: 1px solid rgb(76 76 255 / 20%);
+	border-radius: 8px;
+}
+
+.ingredientImage img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.ingredientPrice {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	white-space: nowrap;
+}
+
+.footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: auto;
+	padding-top: 24px;
+	border-top: 1px solid rgb(76 76 255 / 20%);
+}
+
+.totalPrice {
+	display: flex;
+	align-items: center;
+}
+
+/* Адаптивность */
+
+@media (width <= 768px) {
+	.container {
+		max-height: 70vh;
+	}
+
+	.header {
+		margin-bottom: 30px;
+	}
+
+	.composition {
+		margin-bottom: 30px;
+	}
+
+	.ingredientImage {
+		width: 48px;
+		height: 48px;
+	}
+
+	.ingredientsList {
+		gap: 12px;
+	}
+
+	.footer {
+		flex-direction: column;
+		gap: 16px;
+		text-align: center;
+	}
+}
+
+@media (width <= 480px) {
+	.ingredientInfo {
+		gap: 12px;
+	}
+
+	.ingredientImage {
+		width: 40px;
+		height: 40px;
+	}
+
+	.ingredientItem {
+		gap: 12px;
+	}
+}
