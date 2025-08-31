@@ -10,6 +10,7 @@ import {
 	ProfilePage,
 	RegisterPage,
 	ResetPasswordPage,
+	FeedPage,
 } from '@/pages';
 import { Modal } from '@components/modal/modal';
 import { ProtectedRouteElement } from '@components/routes/protected-route.tsx';
@@ -77,6 +78,8 @@ export const AppRoutes: React.FC = () => {
 
 				{/* Страница ингредиента при прямом переходе (без background) */}
 				<Route path='/ingredients/:id' element={<IngredientPage />} />
+
+				<Route path='/feed' element={<FeedPage />} />
 
 				{/* 404 страница */}
 				<Route path='*' element={<NotFoundPage />} />

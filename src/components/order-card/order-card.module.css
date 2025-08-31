@@ -1,0 +1,138 @@
+.card {
+	padding: 24px;
+	background: var(--colors-interface-secondary);
+	border: 1px solid transparent;
+	border-radius: 40px;
+	cursor: pointer;
+	transition: box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+	border-color: rgb(51 51 255 / 20%);
+	box-shadow: 0 4px 32px 0 rgb(51 51 255 / 25%);
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.name {
+	margin: 0;
+}
+
+.status {
+	margin: 0;
+}
+
+.statusDone {
+	color: #00cccc;
+}
+
+.footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.ingredients {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	margin-right: 24px;
+}
+
+.ingredientWrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.ingredientImage {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 64px;
+	height: 64px;
+	overflow: hidden;
+	background: #4c4cff;
+	border: 2px solid #4c4cff;
+	border-radius: 50%;
+}
+
+.image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+.ingredientCounter {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: rgb(0 0 0 / 60%);
+	border-radius: 50%;
+	backdrop-filter: blur(2px);
+}
+
+.ingredientCounter span {
+	color: #f2f2f3;
+	font-weight: 500;
+	font-size: 16px;
+	text-shadow: 0 0 4px rgb(0 0 0 / 50%);
+}
+
+.price {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+}
+
+/* Адаптивность */
+
+@media (width <= 768px) {
+	.card {
+		padding: 20px;
+	}
+
+	.footer {
+		margin-top: 16px;
+	}
+
+	.ingredients {
+		margin-right: 16px;
+	}
+
+	.ingredientImage {
+		width: 56px;
+		height: 56px;
+	}
+
+	.ingredientWrapper {
+		margin-left: -8px;
+	}
+
+	.ingredientWrapper:first-child {
+		margin-left: 0;
+	}
+}
+
+@media (width <= 480px) {
+	.card {
+		padding: 16px;
+	}
+
+	.ingredientImage {
+		width: 48px;
+		height: 48px;
+	}
+
+	.ingredientCounter span {
+		font-size: 14px;
+	}
+}
