@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import {
 	Input,
 	Button,
 } from '@ya.praktikum/react-developer-burger-ui-components';
-import { AppDispatch } from '@services/store';
-import { useAppSelector } from '@hooks/redux';
+import { useAppSelector, useAppDispatch } from '@hooks/redux';
 import { updateUserInfo } from '@services/slices/auth-slice';
 import styles from './profile-form.module.css';
 
@@ -16,7 +14,7 @@ interface ProfileFormData {
 }
 
 export const ProfileForm: React.FC = () => {
-	const dispatch = useDispatch<AppDispatch>();
+	const dispatch = useAppDispatch();
 	const { user, isLoading, error } = useAppSelector((state) => state.auth);
 
 	const [formData, setFormData] = useState<ProfileFormData>({

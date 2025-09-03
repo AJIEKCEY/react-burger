@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@services/store';
+import { useAppDispatch, useAppSelector } from '@hooks/redux';
+import { RootState } from '@services/store';
 import {
 	fetchOrderByNumber,
 	clearOrder,
@@ -16,13 +16,15 @@ interface UseOrderResult {
 }
 
 export const useOrder = (orderNumber?: number): UseOrderResult => {
-	const dispatch = useDispatch<AppDispatch>();
-	const { order, loading, error } = useSelector(
+	const dispatch = useAppDispatch();
+	const { order, loading, error } = useAppSelector(
 		(state: RootState) => state.singleOrder
 	);
 
 	// Пытаемся найти заказ в ленте заказов если он есть
-	const { orders: feedOrders } = useSelector((state: RootState) => state.feed);
+	const { orders: feedOrders } = useAppSelector(
+		(state: RootState) => state.feed
+	);
 	const orderFromFeed = feedOrders.find((o) => o.number === orderNumber);
 
 	// Автоматически загружаем заказ если он нужен и не найден в ленте

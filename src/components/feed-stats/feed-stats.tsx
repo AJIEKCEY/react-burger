@@ -1,10 +1,10 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '@hooks/redux';
 import styles from './feed-stats.module.css';
 import { RootState } from '@/services/store';
 
 export const FeedStats: React.FC = () => {
-	const { orders, total, totalToday } = useSelector(
+	const { orders, total, totalToday } = useAppSelector(
 		(state: RootState) => state.feed
 	);
 

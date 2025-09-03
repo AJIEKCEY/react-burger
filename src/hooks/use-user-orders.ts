@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@services/store';
+import { useAppDispatch, useAppSelector } from '@hooks/redux';
+import { RootState } from '@services/store';
 import {
 	connectUserOrders,
 	disconnectUserOrders,
@@ -17,7 +17,7 @@ interface UseUserOrdersResult {
 }
 
 export const useUserOrders = (): UseUserOrdersResult => {
-	const dispatch = useDispatch<AppDispatch>();
+	const dispatch = useAppDispatch();
 
 	const {
 		orders: rawOrders,
@@ -26,7 +26,7 @@ export const useUserOrders = (): UseUserOrdersResult => {
 		loading,
 		error,
 		connected,
-	} = useSelector((state: RootState) => state.userOrders);
+	} = useAppSelector((state: RootState) => state.userOrders);
 
 	// Сортируем заказы по дате (новые сверху)
 	const orders = useMemo(() => {

@@ -6,15 +6,14 @@ import {
 	useLocation,
 	useNavigate,
 } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@services/store';
+import { useAppDispatch } from '@hooks/redux';
 import { logoutUser } from '@services/actions/auth';
 import { ProfileForm } from '@components/profile-form/profile-form';
 import { ProfileOrders } from '@components/profile-orders/profile-orders';
 import styles from './profile.module.css';
 
 export const ProfilePage: React.FC = () => {
-	const dispatch = useDispatch<AppDispatch>();
+	const dispatch = useAppDispatch();
 	const location = useLocation();
 
 	const navigate = useNavigate();
