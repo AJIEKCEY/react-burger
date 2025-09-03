@@ -7,15 +7,11 @@ import { Loader } from '@/components/loader/loader';
 import { ErrorMessage } from '@/components/error-message/error-message';
 import { AppDispatch, RootState } from '@/services/store';
 import { connectFeed, disconnectFeed } from '@/services/slices/feed-slice';
-import { fetchIngredients } from '@/services/actions/burger-ingredients';
 
 export const FeedPage: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();
 	const { orders, loading, error, connected } = useSelector(
 		(state: RootState) => state.feed
-	);
-	const { items: ingredients, loading: ingredientsLoading } = useSelector(
-		(state: RootState) => state.burgerIngredients
 	);
 
 	// Используем ref для отслеживания состояния монтирования
@@ -24,11 +20,6 @@ export const FeedPage: React.FC = () => {
 
 	useEffect(() => {
 		isMounted.current = true;
-
-		// Загружаем ингредиенты, если они еще не загружены
-		if (!ingredients || ingredients.length === 0) {
-			dispatch(fetchIngredients());
-		}
 
 		// Подключаемся к WebSocket только один раз
 		if (!connectionInitiated.current && !connected) {
@@ -58,8 +49,7 @@ export const FeedPage: React.FC = () => {
 	}, [error, connected, loading, dispatch]);
 
 	// Показываем лоадер только если загружаются ингредиенты И нет заказов
-	const shouldShowLoader =
-		(loading && orders.length === 0) || ingredientsLoading;
+	const shouldShowLoader = loading && orders.length === 0;
 
 	// Показываем ошибку только если нет заказов для отображения и нет загрузки
 	const shouldShowError = error && orders.length === 0 && !loading;

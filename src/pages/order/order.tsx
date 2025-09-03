@@ -1,33 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { OrderInfo } from '@components/order-info/order-info';
 import { Loader } from '@components/loader/loader';
 import { ErrorMessage } from '@components/error-message/error-message';
 import { useOrder } from '@hooks/use-order';
-import { AppDispatch, RootState } from '@services/store';
-import { fetchIngredients } from '@services/actions/burger-ingredients';
 import styles from './order.module.css';
 
 export const OrderPage: React.FC = () => {
 	const { number } = useParams<{ number: string }>();
-	const dispatch = useDispatch<AppDispatch>();
-
-	const { items: ingredients, loading: ingredientsLoading } = useSelector(
-		(state: RootState) => state.burgerIngredients
-	);
 
 	const orderNumber = number ? parseInt(number, 10) : undefined;
 	const { order, loading: orderLoading, error } = useOrder(orderNumber);
 
-	useEffect(() => {
-		// Загружаем ингредиенты, если они еще не загружены
-		if (!ingredients || ingredients.length === 0) {
-			dispatch(fetchIngredients());
-		}
-	}, [dispatch, ingredients]);
-
-	const isLoading = orderLoading || ingredientsLoading;
+	const isLoading = orderLoading;
 
 	// Если номер заказа некорректный
 	if (!orderNumber || isNaN(orderNumber)) {
