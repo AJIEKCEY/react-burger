@@ -12,6 +12,7 @@ import styles from './order-card.module.css';
 
 interface OrderCardProps {
 	order: Order;
+	onClick?: () => void;
 }
 
 export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {

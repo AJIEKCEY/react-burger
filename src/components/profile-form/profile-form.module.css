@@ -1,0 +1,50 @@
+.container {
+	width: 100%;
+	max-width: 480px;
+	margin-left: 50px;
+	padding-top: 40px;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.inputWrapper {
+	width: 100%;
+}
+
+.error {
+	padding: 8px;
+	text-align: center;
+	background: rgb(230 73 73 / 10%);
+	border: 1px solid rgb(230 73 73 / 30%);
+	border-radius: 4px;
+}
+
+.actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 16px;
+	margin-top: 8px;
+}
+
+/* Адаптивность */
+
+@media (width <= 768px) {
+	.form {
+		gap: 20px;
+	}
+
+	.actions {
+		flex-direction: column-reverse;
+		gap: 12px;
+	}
+}
+
+@media (width <= 480px) {
+	.form {
+		gap: 16px;
+	}
+}

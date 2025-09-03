@@ -102,6 +102,12 @@ export const AppRoutes: React.FC = () => {
 				<Routes>
 					<Route path='/ingredients/:id' element={<IngredientModalWrapper />} />
 					<Route path='/feed/:number' element={<OrderModalWrapper />} />
+					<Route
+						path='/profile/orders/:number'
+						element={
+							<ProtectedRouteElement element={<ProfileOrderModalWrapper />} />
+						}
+					/>
 				</Routes>
 			)}
 		</>
@@ -199,6 +205,74 @@ const OrderModalWrapper: React.FC = () => {
 	}
 
 	// Показываем заказ
+	return (
+		<Modal title={`#${order.number}`} onClose={handleCloseModal}>
+			<OrderInfo order={order} />
+		</Modal>
+	);
+};
+
+// Компонент-обёртка для модального окна заказа в профиле
+const ProfileOrderModalWrapper: React.FC = () => {
+	const { number } = useParams<{ number: string }>();
+	const location = useLocation();
+	const navigate = useNavigate();
+	const background = location.state?.background;
+
+	const orderNumber = number ? parseInt(number, 10) : undefined;
+	const { order, loading, error } = useOrder(orderNumber);
+
+	const handleCloseModal = () => {
+		navigate(background || '/profile/orders', { replace: true });
+	};
+
+	// Используем ту же логику что и в OrderModalWrapper
+	if (!orderNumber || isNaN(orderNumber)) {
+		return (
+			<Modal title='Ошибка' onClose={handleCloseModal}>
+				<div style={{ padding: '40px', textAlign: 'center' }}>
+					<p className='text text_type_main-default text_color_inactive'>
+						Некорректный номер заказа
+					</p>
+				</div>
+			</Modal>
+		);
+	}
+
+	if (loading) {
+		return (
+			<Modal title='Загрузка заказа...' onClose={handleCloseModal}>
+				<div style={{ padding: '40px', textAlign: 'center' }}>
+					<Loader />
+				</div>
+			</Modal>
+		);
+	}
+
+	if (error && !order) {
+		return (
+			<Modal title='Ошибка' onClose={handleCloseModal}>
+				<div style={{ padding: '40px', textAlign: 'center' }}>
+					<p className='text text_type_main-default text_color_inactive'>
+						{error}
+					</p>
+				</div>
+			</Modal>
+		);
+	}
+
+	if (!order) {
+		return (
+			<Modal title='Заказ не найден' onClose={handleCloseModal}>
+				<div style={{ padding: '40px', textAlign: 'center' }}>
+					<p className='text text_type_main-default text_color_inactive'>
+						Заказ #{orderNumber} не найден
+					</p>
+				</div>
+			</Modal>
+		);
+	}
+
 	return (
 		<Modal title={`#${order.number}`} onClose={handleCloseModal}>
 			<OrderInfo order={order} />

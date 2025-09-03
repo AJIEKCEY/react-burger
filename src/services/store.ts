@@ -6,6 +6,7 @@ import authReducer from './slices/auth-slice';
 import userReducer from './slices/user-slice';
 import feedReducer from './slices/feed-slice';
 import singleOrderReducer from './slices/single-order-slice';
+import userOrdersReducer from './slices/user-orders-slice';
 
 const rootReducer = combineReducers({
 	feed: feedReducer,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
 	singleOrder: singleOrderReducer,
 	auth: authReducer,
 	user: userReducer,
+	userOrders: userOrdersReducer,
 });
 
 export const store = configureStore({

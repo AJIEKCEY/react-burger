@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { wsManager } from '@/services/websocket-manager';
+import { WebSocketMessageData, wsManager } from '@/services/websocket-manager';
 
 // Типы данных
 export interface Order {
@@ -48,7 +48,7 @@ const initialState: FeedState = {
 const FEED_WS_URL = 'wss://norma.nomoreparties.space/orders/all';
 
 // Создаем фиксированные колбэки для WebSocket
-let feedMessageCallback: ((data: FeedData) => void) | null = null;
+let feedMessageCallback: ((data: WebSocketMessageData) => void) | null = null;
 let feedOpenCallback: (() => void) | null = null;
 let feedErrorCallback: ((error: WebSocketError) => void) | null = null;
 
@@ -72,8 +72,24 @@ export const connectFeed = createAsyncThunk<
 
 		// Создаем колбэки только один раз
 		if (!feedMessageCallback) {
-			feedMessageCallback = (data: FeedData) => {
-				dispatch(wsMessage(data));
+			feedMessageCallback = (data: WebSocketMessageData) => {
+				// Type guard для проверки структуры данных
+				if (
+					typeof data === 'object' &&
+					data !== null &&
+					'orders' in data &&
+					'total' in data &&
+					'totalToday' in data &&
+					'success' in data
+				) {
+					const feedData = data as unknown as FeedData;
+					dispatch(wsMessage(feedData));
+				} else {
+					console.error(
+						'Получены некорректные данные от Feed WebSocket:',
+						data
+					);
+				}
 			};
 		}
 
