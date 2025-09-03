@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@hooks/redux';
-import styles from './feed.module.css';
 import { OrderCard } from '@/components/order-card/order-card';
 import { FeedStats } from '@/components/feed-stats/feed-stats';
 import { Loader } from '@/components/loader/loader';
 import { ErrorMessage } from '@/components/error-message/error-message';
 import { RootState } from '@/services/store';
 import { connectFeed, disconnectFeed } from '@/services/slices/feed-slice';
+import styles from './feed.module.css';
 
 export const FeedPage: React.FC = () => {
 	const dispatch = useAppDispatch();

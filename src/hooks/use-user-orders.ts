@@ -14,6 +14,7 @@ interface UseUserOrdersResult {
 	loading: boolean;
 	error: string | null;
 	connected: boolean;
+	reconnect: () => void;
 }
 
 export const useUserOrders = (): UseUserOrdersResult => {
@@ -27,6 +28,27 @@ export const useUserOrders = (): UseUserOrdersResult => {
 		error,
 		connected,
 	} = useAppSelector((state: RootState) => state.userOrders);
+
+	const reconnect = () => {
+		dispatch(disconnectUserOrders());
+		setTimeout(() => {
+			dispatch(connectUserOrders());
+		}, 1000);
+	};
+
+	// Автоматическое переподключение при ошибках токена
+	useEffect(() => {
+		if (
+			error &&
+			(error.includes('токен') ||
+				error.includes('Invalid') ||
+				error.includes('token'))
+		) {
+			console.log('🔄 Token error detected, attempting reconnect...');
+			const timer = setTimeout(reconnect, 2000);
+			return () => clearTimeout(timer);
+		}
+	}, [error]);
 
 	// Сортируем заказы по дате (новые сверху)
 	const orders = useMemo(() => {
@@ -60,5 +82,6 @@ export const useUserOrders = (): UseUserOrdersResult => {
 		loading,
 		error,
 		connected,
+		reconnect,
 	};
 };

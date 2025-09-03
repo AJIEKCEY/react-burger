@@ -2,7 +2,6 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { wsManager, WebSocketMessageData } from '@/services/websocket-manager';
 import { tokenService } from '@/services/token-service';
 
-// Используем те же типы что и в feed-slice
 export interface Order {
 	ingredients: string[];
 	_id: string;
@@ -13,7 +12,7 @@ export interface Order {
 	name?: string;
 }
 
-export interface UserOrdersData {
+export interface UserOrdersData extends WebSocketMessageData {
 	success: boolean;
 	orders: Order[];
 	total: number;
@@ -35,6 +34,12 @@ export interface WebSocketError {
 	type?: string;
 }
 
+// Типы для WebSocket сообщений об ошибках
+interface WebSocketErrorMessage extends WebSocketMessageData {
+	success: false;
+	message: string;
+}
+
 const initialState: UserOrdersState = {
 	orders: [],
 	total: 0,
@@ -49,12 +54,6 @@ const getUserOrdersWSUrl = () => {
 	const accessToken = tokenService.getAccessToken();
 	return `wss://norma.nomoreparties.space/orders?token=${accessToken}`;
 };
-
-// Колбэки для WebSocket
-let userOrdersMessageCallback: ((data: WebSocketMessageData) => void) | null =
-	null;
-let userOrdersOpenCallback: (() => void) | null = null;
-let userOrdersErrorCallback: ((error: WebSocketError) => void) | null = null;
 
 // Thunk для подключения к WebSocket
 export const connectUserOrders = createAsyncThunk<
@@ -72,9 +71,10 @@ export const connectUserOrders = createAsyncThunk<
 		}
 
 		// Проверяем наличие токена
-		const accessToken = tokenService.getAccessToken();
+		const accessToken = await tokenService.ensureValidToken();
+
 		if (!accessToken) {
-			return rejectWithValue('Отсутствует токен авторизации');
+			return rejectWithValue('Не удалось получить действительный токен');
 		}
 
 		dispatch(wsConnecting());
@@ -82,90 +82,95 @@ export const connectUserOrders = createAsyncThunk<
 		const wsUrl = getUserOrdersWSUrl();
 
 		// Создаем колбэки
-		if (!userOrdersMessageCallback) {
-			userOrdersMessageCallback = (data: WebSocketMessageData) => {
-				// Проверяем, что данные соответствуют UserOrdersData
-				if (
-					typeof data === 'object' &&
-					data !== null &&
-					'orders' in data &&
-					'total' in data &&
-					'totalToday' in data &&
-					'success' in data
-				) {
-					const userOrdersData = data as unknown as UserOrdersData;
-					dispatch(wsMessage(userOrdersData));
-				} else {
-					console.error('Получены некорректные данные от WebSocket:', data);
-				}
-			};
-		}
+		const messageCallback = (data: WebSocketMessageData) => {
+			if (isErrorData(data)) {
+				dispatch(wsError(data.message));
+				return;
+			}
 
-		if (!userOrdersOpenCallback) {
-			userOrdersOpenCallback = () => {
-				dispatch(wsConnected());
-			};
-		}
+			if (isUserOrdersData(data)) {
+				dispatch(wsMessage(data));
+			}
+		};
 
-		if (!userOrdersErrorCallback) {
-			userOrdersErrorCallback = (error: WebSocketError) => {
-				dispatch(
-					wsError(
-						`Ошибка подключения к истории заказов: ${error.message || 'Неизвестная ошибка'}`
-					)
-				);
-			};
-		}
+		const openCallback = () => dispatch(wsConnected());
+		const errorCallback = (error: WebSocketError) =>
+			dispatch(
+				wsError(`Ошибка подключения: ${error.message || 'Неизвестная ошибка'}`)
+			);
 
-		wsManager.connect(
-			wsUrl,
-			userOrdersMessageCallback,
-			userOrdersOpenCallback,
-			userOrdersErrorCallback
-		);
+		wsManager.connect(wsUrl, messageCallback, openCallback, errorCallback);
 	} catch (error) {
-		const errorMessage =
-			error instanceof Error ? error.message : 'Неизвестная ошибка подключения';
-		return rejectWithValue(errorMessage);
+		return rejectWithValue(
+			error instanceof Error ? error.message : 'Ошибка подключения'
+		);
 	}
 });
 
 // Thunk для отключения от WebSocket
-export const disconnectUserOrders = createAsyncThunk<
-	void,
-	void,
-	{
-		state: { userOrders: UserOrdersState };
-		rejectValue: string;
-	}
->(
+export const disconnectUserOrders = createAsyncThunk<void, void>(
 	'userOrders/disconnect',
-	async (_, { dispatch, getState, rejectWithValue }) => {
-		try {
-			const state = getState();
-			const wsUrl = getUserOrdersWSUrl();
-
-			if (
-				!state.userOrders.connected &&
-				wsManager.getSubscribersCount(wsUrl) === 0
-			) {
-				return;
-			}
-
-			if (userOrdersMessageCallback) {
-				wsManager.disconnect(wsUrl, userOrdersMessageCallback);
-			} else {
-				wsManager.disconnect(wsUrl);
-			}
-
-			dispatch(wsDisconnected());
-		} catch (error) {
-			const errorMessage =
-				error instanceof Error ? error.message : 'Ошибка при отключении';
-			return rejectWithValue(errorMessage);
-		}
+	async (_, { dispatch }) => {
+		const wsUrl = getUserOrdersWSUrl();
+		wsManager.disconnect(wsUrl);
+		dispatch(wsDisconnected());
 	}
 );
+
+// Type Guards для проверки типов входящих сообщений
+const isErrorData = (
+	data: WebSocketMessageData
+): data is WebSocketErrorMessage => {
+	return (
+		typeof data === 'object' &&
+		data !== null &&
+		'success' in data &&
+		data.success === false &&
+		'message' in data &&
+		(data as WebSocketErrorMessage).message === 'string'
+	);
+};
+
+const isUserOrdersData = (
+	data: WebSocketMessageData
+): data is UserOrdersData => {
+	if (typeof data !== 'object' || data === null) {
+		return false;
+	}
+
+	const potentialData = data as Record<string, unknown>;
+
+	return (
+		'orders' in potentialData &&
+		'total' in potentialData &&
+		'totalToday' in potentialData &&
+		'success' in potentialData &&
+		Array.isArray(potentialData.orders) &&
+		typeof potentialData.total === 'number' &&
+		typeof potentialData.totalToday === 'number' &&
+		potentialData.success === true
+	);
+};
+
+const isValidOrder = (obj: unknown): obj is Order => {
+	if (typeof obj !== 'object' || obj === null) {
+		return false;
+	}
+
+	const order = obj as Record<string, unknown>;
+
+	return (
+		typeof order._id === 'string' &&
+		typeof order.number === 'number' &&
+		typeof order.status === 'string' &&
+		['created', 'pending', 'done'].includes(order.status as string) &&
+		typeof order.createdAt === 'string' &&
+		typeof order.updatedAt === 'string' &&
+		Array.isArray(order.ingredients) &&
+		order.ingredients.every((ing) => typeof ing === 'string') &&
+		(order.name === undefined || typeof order.name === 'string')
+	);
+};
 
 export const userOrdersSlice = createSlice({
 	name: 'userOrders',
@@ -191,6 +196,15 @@ export const userOrdersSlice = createSlice({
 		wsMessage: (state, action: PayloadAction<UserOrdersData>) => {
 			if (action.payload.success) {
 				const { orders, total, totalToday } = action.payload;
+				// Дополнительная валидация заказов
+				const validOrders = orders.filter(isValidOrder);
+
+				if (validOrders.length !== orders.length) {
+					console.warn(
+						`Получено ${orders.length} заказов, валидных: ${validOrders.length}`
+					);
+				}
+
 				state.orders = orders;
 				state.total = total;
 				state.totalToday = totalToday;
@@ -201,13 +215,6 @@ export const userOrdersSlice = createSlice({
 			state.orders = [];
 			state.total = 0;
 			state.totalToday = 0;
-		},
-		forceDisconnect: () => {
-			const wsUrl = getUserOrdersWSUrl();
-			wsManager.disconnect(wsUrl);
-			userOrdersMessageCallback = null;
-			userOrdersOpenCallback = null;
-			userOrdersErrorCallback = null;
 		},
 	},
 	extraReducers: (builder) => {
@@ -223,17 +230,6 @@ export const userOrdersSlice = createSlice({
 				state.loading = false;
 				state.error =
 					action.payload || action.error.message || 'Ошибка подключения';
-			})
-			.addCase(disconnectUserOrders.pending, () => {
-				// Индикатор процесса отключения
-			})
-			.addCase(disconnectUserOrders.fulfilled, (state) => {
-				state.connected = false;
-			})
-			.addCase(disconnectUserOrders.rejected, (state, action) => {
-				state.connected = false;
-				state.error =
-					action.payload || action.error.message || 'Ошибка при отключении';
 			});
 	},
 });
@@ -245,7 +241,6 @@ export const {
 	wsError,
 	wsMessage,
 	clearUserOrders,
-	forceDisconnect,
 } = userOrdersSlice.actions;
 
 export default userOrdersSlice.reducer;

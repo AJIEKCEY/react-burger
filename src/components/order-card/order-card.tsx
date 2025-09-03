@@ -50,9 +50,18 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
 		}, 0);
 	}, [orderIngredients]);
 
+	// Автоматически определяем базовый путь на основе текущего location
+	const getBasePath = () => {
+		if (location.pathname.startsWith('/profile/orders')) {
+			return '/profile/orders';
+		}
+		return '/feed'; // По умолчанию
+	};
+
 	const handleClick = () => {
 		// Используем номер заказа в URL, а не ID
-		navigate(`/feed/${order.number}`, {
+		const basePath = getBasePath();
+		navigate(`${basePath}/${order.number}`, {
 			state: { background: location },
 		});
 	};
@@ -96,11 +105,11 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
 			</header>
 
 			<div className={styles.content}>
-				<h3 className='text text_type_main-medium mb-2'>
+				<h3 className={`text text_type_main-medium mb-2 ${styles.name}`}>
 					{order.name || 'Название недоступно'}
 				</h3>
 				<p
-					className={`text text_type_main-default mb-6 ${getStatusClass(order.status)}`}>
+					className={`text text_type_main-default mb-6 ${getStatusClass(order.status)} ${styles.status}`}>
 					{getStatusText(order.status)}
 				</p>
 

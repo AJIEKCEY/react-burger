@@ -100,6 +100,45 @@ class TokenService {
 		const token = this.getAccessToken();
 		return token ? `Bearer ${token}` : null;
 	}
+
+	async ensureValidToken(): Promise<string | null> {
+		const accessToken = this.getAccessToken();
+
+		// Если токена нет или он истёк
+		if (!accessToken || this.isTokenExpired(accessToken)) {
+			const refreshToken = this.getRefreshToken();
+
+			if (!refreshToken || this.isTokenExpired(refreshToken)) {
+				// Refresh token тоже истёк - нужна повторная авторизация
+				this.clearTokens();
+				return null;
+			}
+
+			try {
+				// Обновляем токены через API
+				const response = await fetch('/api/auth/token', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ token: refreshToken }),
+				});
+
+				if (response.ok) {
+					const data = await response.json();
+					this.setTokens(data.accessToken, data.refreshToken);
+					return data.accessToken;
+				}
+			} catch (error) {
+				console.error('Token refresh failed:', error);
+			}
+
+			this.clearTokens();
+			return null;
+		}
+
+		return accessToken;
+	}
 }
 
 export const tokenService = new TokenService();

@@ -6,9 +6,8 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { apiRequest } from '@/utils/api';
 import { API_ENDPOINTS } from '@/constants/api';
-
+import { ErrorMessage } from '@components/error-message/error-message';
 import styles from './forgot-password.module.css';
-import { ErrorMessage } from '@components/error-message/error-message.tsx';
 
 interface ForgotPasswordResponse {
 	success: boolean;
