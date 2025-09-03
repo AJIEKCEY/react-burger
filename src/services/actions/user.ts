@@ -36,8 +36,7 @@ export const checkAuthUser = createAsyncThunk(
 			}
 
 			// Получаем данные пользователя
-			const response = await api.get('/auth/user');
-			return response;
+			return await api.get('/auth/user');
 		} catch (error) {
 			tokenService.clearTokens();
 			return rejectWithValue('Ошибка проверки авторизации');
