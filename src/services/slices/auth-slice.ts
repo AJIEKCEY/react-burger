@@ -24,8 +24,8 @@ export interface AuthState {
 }
 
 const initialState: AuthState = {
-	user: null,
-	isAuthenticated: false,
+	user: tokenService.getUserData(),
+	isAuthenticated: tokenService.hasValidTokens(),
 	isLoading: false,
 	error: null,
 	isAuthChecked: false,

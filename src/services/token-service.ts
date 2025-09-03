@@ -3,7 +3,7 @@ import { getCookie, setCookie, deleteCookie } from '@/utils/utils';
 class TokenService {
 	private readonly ACCESS_TOKEN_KEY = 'accessToken';
 	private readonly REFRESH_TOKEN_KEY = 'refreshToken';
-	private readonly USER_DATA_KEY = 'userData';
+	private readonly USER_DATA_KEY = 'user';
 
 	// Получение access token
 	getAccessToken(): string | null {
@@ -17,7 +17,8 @@ class TokenService {
 
 	// Получение данных пользователя
 	getUserData(): { email: string; name: string } | null {
-		const userData = getCookie(this.USER_DATA_KEY);
+		const userData = localStorage.getItem(this.USER_DATA_KEY);
+
 		if (!userData) return null;
 
 		try {
@@ -72,9 +73,26 @@ class TokenService {
 		deleteCookie(this.USER_DATA_KEY);
 	}
 
+	isTokenExpired(token: string): boolean {
+		try {
+			const payload = JSON.parse(atob(token.split('.')[1]));
+			return payload.exp * 1000 < Date.now();
+		} catch {
+			return true;
+		}
+	}
+
 	// Проверка наличия токенов
 	hasValidTokens(): boolean {
-		return !!(this.getAccessToken() && this.getRefreshToken());
+		const accessToken = this.getAccessToken();
+		const refreshToken = this.getRefreshToken();
+
+		if (!refreshToken) return false;
+
+		// Если access token истек, но refresh token есть - это всё ещё валидное состояние
+		if (!accessToken) return true;
+
+		return !this.isTokenExpired(accessToken);
 	}
 
 	// Получение токена с префиксом Bearer для запросов

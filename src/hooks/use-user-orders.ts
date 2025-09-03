@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@services/store';
 import {
@@ -19,9 +19,22 @@ interface UseUserOrdersResult {
 export const useUserOrders = (): UseUserOrdersResult => {
 	const dispatch = useDispatch<AppDispatch>();
 
-	const { orders, total, totalToday, loading, error, connected } = useSelector(
-		(state: RootState) => state.userOrders
-	);
+	const {
+		orders: rawOrders,
+		total,
+		totalToday,
+		loading,
+		error,
+		connected,
+	} = useSelector((state: RootState) => state.userOrders);
+
+	// Сортируем заказы по дате (новые сверху)
+	const orders = useMemo(() => {
+		return [...rawOrders].sort(
+			(a, b) =>
+				new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+		);
+	}, [rawOrders]);
 
 	const connect = () => {
 		dispatch(connectUserOrders());
