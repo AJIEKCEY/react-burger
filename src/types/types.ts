@@ -7,6 +7,7 @@ export interface CustomLocationState {
 	orderIntent?: boolean;
 	autoSubmitOrder?: boolean;
 	canResetPassword?: boolean;
+	isNewOrder?: boolean;
 }
 
 // Используем дженерик Location

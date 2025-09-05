@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-	Route,
-	Routes,
-	useLocation,
-	useNavigate,
-	useParams,
-} from 'react-router-dom';
-import { useAppSelector } from '@hooks/redux';
+import { Route, Routes, useLocation, useParams } from 'react-router-dom';
 import {
 	ForgotPasswordPage,
 	HomePage,
@@ -19,16 +12,10 @@ import {
 	FeedPage,
 	OrderPage,
 } from '@/pages';
-import { Modal } from '@components/modal/modal';
 import { ProtectedRouteElement } from '@components/routes/protected-route.tsx';
 import { ProtectedResetRoute } from '@components/routes/protected-reset-route.tsx';
-
-import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
-import { OrderInfo } from '@components/order-info/order-info';
-import { selectIngredients } from '@services/selectors.ts';
-
-import { Loader } from '@components/loader/loader.tsx';
-import { useOrder } from '@hooks/use-order';
+import { UniversalOrderModalWrapper } from '@components/modal-wrappers/order-modal-wrapper.tsx';
+import { IngredientModalWrapper } from '@components/modal-wrappers/ingredient-modal-wrapper.tsx';
 
 export const AppRoutes: React.FC = () => {
 	const location = useLocation();
@@ -93,6 +80,12 @@ export const AppRoutes: React.FC = () => {
 				<Route path='/feed' element={<FeedPage />} />
 				<Route path='/feed/:number' element={<OrderPage />} />
 
+				{/* Страница заказа профиля для прямого перехода */}
+				<Route
+					path='/profile/orders/:number'
+					element={<ProtectedRouteElement element={<OrderPage />} />}
+				/>
+
 				{/* 404 страница */}
 				<Route path='*' element={<NotFoundPage />} />
 			</Routes>
@@ -101,11 +94,12 @@ export const AppRoutes: React.FC = () => {
 			{background && (
 				<Routes>
 					<Route path='/ingredients/:id' element={<IngredientModalWrapper />} />
-					<Route path='/feed/:number' element={<OrderModalWrapper />} />
+					<Route path='/orders/:number' element={<OrdersModalRoute />} />
+					<Route path='/feed/:number' element={<FeedModalRoute />} />
 					<Route
 						path='/profile/orders/:number'
 						element={
-							<ProtectedRouteElement element={<ProfileOrderModalWrapper />} />
+							<ProtectedRouteElement element={<ProfileOrdersModalRoute />} />
 						}
 					/>
 				</Routes>
@@ -114,168 +108,42 @@ export const AppRoutes: React.FC = () => {
 	);
 };
 
-// Компонент-обёртка для модального окна ингредиента
-const IngredientModalWrapper: React.FC = () => {
+// Простые компоненты-роуты
+const OrdersModalRoute: React.FC = () => {
+	const { number } = useParams<{ number: string }>();
 	const location = useLocation();
-	const navigate = useNavigate();
-
-	const ingredients = useAppSelector(selectIngredients);
-	const background = location.state?.background;
-
-	const ingredientId = location.pathname.split('/')[2];
-	const ingredient = ingredients.find((item) => item._id === ingredientId);
-
-	const handleCloseModal = () => {
-		navigate(background || '/', { replace: true });
-	};
-
-	if (!ingredient) {
-		return null;
-	}
+	const orderNumber = number ? parseInt(number, 10) : undefined;
+	const isNewOrder = location.state?.isNewOrder;
 
 	return (
-		<Modal title='Детали ингредиента' onClose={handleCloseModal}>
-			<IngredientDetails ingredient={ingredient} />
-		</Modal>
+		<UniversalOrderModalWrapper
+			orderNumber={orderNumber}
+			fallbackPath='/'
+			isNewOrder={isNewOrder}
+		/>
 	);
 };
 
-// Компонент-обёртка для модального окна заказа
-const OrderModalWrapper: React.FC = () => {
+const FeedModalRoute: React.FC = () => {
 	const { number } = useParams<{ number: string }>();
-	const location = useLocation();
-	const navigate = useNavigate();
-	const background = location.state?.background;
-
 	const orderNumber = number ? parseInt(number, 10) : undefined;
-	const { order, loading, error } = useOrder(orderNumber);
 
-	const handleCloseModal = () => {
-		navigate(background || '/feed', { replace: true });
-	};
-
-	// Некорректный номер заказа
-	if (!orderNumber || isNaN(orderNumber)) {
-		return (
-			<Modal title='Ошибка' onClose={handleCloseModal}>
-				<div style={{ padding: '40px', textAlign: 'center' }}>
-					<p className='text text_type_main-default text_color_inactive'>
-						Некорректный номер заказа
-					</p>
-				</div>
-			</Modal>
-		);
-	}
-
-	// Загрузка
-	if (loading) {
-		return (
-			<Modal title='Загрузка заказа...' onClose={handleCloseModal}>
-				<div style={{ padding: '40px', textAlign: 'center' }}>
-					<Loader />
-				</div>
-			</Modal>
-		);
-	}
-
-	// Ошибка
-	if (error && !order) {
-		return (
-			<Modal title='Ошибка' onClose={handleCloseModal}>
-				<div style={{ padding: '40px', textAlign: 'center' }}>
-					<p className='text text_type_main-default text_color_inactive'>
-						{error}
-					</p>
-				</div>
-			</Modal>
-		);
-	}
-
-	// Заказ не найден
-	if (!order) {
-		return (
-			<Modal title='Заказ не найден' onClose={handleCloseModal}>
-				<div style={{ padding: '40px', textAlign: 'center' }}>
-					<p className='text text_type_main-default text_color_inactive'>
-						Заказ #{orderNumber} не найден
-					</p>
-				</div>
-			</Modal>
-		);
-	}
-
-	// Показываем заказ
 	return (
-		<Modal title={`#${order.number}`} onClose={handleCloseModal}>
-			<OrderInfo order={order} />
-		</Modal>
+		<UniversalOrderModalWrapper
+			orderNumber={orderNumber}
+			fallbackPath='/feed'
+		/>
 	);
 };
 
-// Компонент-обёртка для модального окна заказа в профиле
-const ProfileOrderModalWrapper: React.FC = () => {
+const ProfileOrdersModalRoute: React.FC = () => {
 	const { number } = useParams<{ number: string }>();
-	const location = useLocation();
-	const navigate = useNavigate();
-	const background = location.state?.background;
-
 	const orderNumber = number ? parseInt(number, 10) : undefined;
-	const { order, loading, error } = useOrder(orderNumber);
-
-	const handleCloseModal = () => {
-		navigate(background || '/profile/orders', { replace: true });
-	};
-
-	// Используем ту же логику что и в OrderModalWrapper
-	if (!orderNumber || isNaN(orderNumber)) {
-		return (
-			<Modal title='Ошибка' onClose={handleCloseModal}>
-				<div style={{ padding: '40px', textAlign: 'center' }}>
-					<p className='text text_type_main-default text_color_inactive'>
-						Некорректный номер заказа
-					</p>
-				</div>
-			</Modal>
-		);
-	}
-
-	if (loading) {
-		return (
-			<Modal title='Загрузка заказа...' onClose={handleCloseModal}>
-				<div style={{ padding: '40px', textAlign: 'center' }}>
-					<Loader />
-				</div>
-			</Modal>
-		);
-	}
-
-	if (error && !order) {
-		return (
-			<Modal title='Ошибка' onClose={handleCloseModal}>
-				<div style={{ padding: '40px', textAlign: 'center' }}>
-					<p className='text text_type_main-default text_color_inactive'>
-						{error}
-					</p>
-				</div>
-			</Modal>
-		);
-	}
-
-	if (!order) {
-		return (
-			<Modal title='Заказ не найден' onClose={handleCloseModal}>
-				<div style={{ padding: '40px', textAlign: 'center' }}>
-					<p className='text text_type_main-default text_color_inactive'>
-						Заказ #{orderNumber} не найден
-					</p>
-				</div>
-			</Modal>
-		);
-	}
 
 	return (
-		<Modal title={`#${order.number}`} onClose={handleCloseModal}>
-			<OrderInfo order={order} />
-		</Modal>
+		<UniversalOrderModalWrapper
+			orderNumber={orderNumber}
+			fallbackPath='/profile/orders'
+		/>
 	);
 };
