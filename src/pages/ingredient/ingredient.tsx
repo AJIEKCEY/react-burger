@@ -1,27 +1,18 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '@hooks/redux';
+import { useAppSelector } from '@hooks/redux';
 import {
 	selectIngredients,
 	selectIngredientsLoading,
 } from '@services/selectors';
-import { fetchIngredients } from '@services/actions/burger-ingredients';
 import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
 import styles from './ingredient.module.css';
 
 export const IngredientPage: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
-	const dispatch = useAppDispatch();
 
 	const ingredients = useAppSelector(selectIngredients);
 	const loading = useAppSelector(selectIngredientsLoading);
-
-	useEffect(() => {
-		// Если ингредиенты еще не загружены, загружаем их
-		if (ingredients.length === 0) {
-			dispatch(fetchIngredients());
-		}
-	}, [dispatch, ingredients.length]);
 
 	if (loading) {
 		return (

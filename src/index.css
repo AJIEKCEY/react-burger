@@ -1,3 +1,8 @@
+:root {
+	--colors-text-primary: #8585ad;
+	--colors-success: #00cccc;
+}
+
 body {
 	margin: 0;
 }

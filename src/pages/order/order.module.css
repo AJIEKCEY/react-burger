@@ -1,0 +1,41 @@
+.container {
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	max-width: 640px;
+	min-height: calc(100vh - 88px);
+	margin: 0 auto;
+	padding: 40px 20px;
+}
+
+.orderWrapper {
+	width: 100%;
+}
+
+.orderNumber {
+	color: #f2f2f3;
+	text-align: center;
+}
+
+.notFound {
+	padding: 60px 20px;
+	text-align: center;
+}
+
+/* Адаптивность */
+
+@media (width <= 768px) {
+	.container {
+		padding: 20px 16px;
+	}
+}
+
+@media (width <= 480px) {
+	.container {
+		padding: 16px 12px;
+	}
+
+	.notFound {
+		padding: 40px 16px;
+	}
+}

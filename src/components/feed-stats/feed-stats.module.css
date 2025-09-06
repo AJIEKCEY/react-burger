@@ -1,0 +1,56 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	gap: 60px;
+}
+
+.ordersStatus {
+	display: flex;
+	gap: 72px;
+}
+
+.statusColumn {
+	flex: 1;
+}
+
+.statusColumn h3 {
+	margin: 0 0 24px;
+}
+
+.columnsContainer {
+	display: flex;
+	gap: 24px;
+}
+
+.numberColumn {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.orderNumber {
+	color: var(--colors-text-primary);
+}
+
+.orderNumber.done {
+	color: var(--colors-success);
+}
+
+.totalStats {
+	display: flex;
+	flex-direction: column;
+	gap: 60px;
+}
+
+.statItem h3 {
+	margin: 0 0 15px;
+}
+
+.totalNumber {
+	margin: 0;
+	text-shadow:
+		0 0 16px rgb(51 51 255 / 25%),
+		0 0 8px rgb(51 51 255 / 25%),
+		0 4px 16px rgb(51 51 255 / 25%);
+}

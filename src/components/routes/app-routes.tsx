@@ -1,6 +1,5 @@
 import React from 'react';
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { useAppSelector } from '@hooks/redux';
+import { Route, Routes, useLocation, useParams } from 'react-router-dom';
 import {
 	ForgotPasswordPage,
 	HomePage,
@@ -10,14 +9,13 @@ import {
 	ProfilePage,
 	RegisterPage,
 	ResetPasswordPage,
+	FeedPage,
+	OrderPage,
 } from '@/pages';
-import { Modal } from '@components/modal/modal';
 import { ProtectedRouteElement } from '@components/routes/protected-route.tsx';
 import { ProtectedResetRoute } from '@components/routes/protected-reset-route.tsx';
-
-import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
-import { OrderDetails } from '@components/order-details/order-details.tsx';
-import { selectIngredients } from '@services/selectors.ts';
+import { UniversalOrderModalWrapper } from '@components/modal-wrappers/order-modal-wrapper.tsx';
+import { IngredientModalWrapper } from '@components/modal-wrappers/ingredient-modal-wrapper.tsx';
 
 export const AppRoutes: React.FC = () => {
 	const location = useLocation();
@@ -78,6 +76,16 @@ export const AppRoutes: React.FC = () => {
 				{/* Страница ингредиента при прямом переходе (без background) */}
 				<Route path='/ingredients/:id' element={<IngredientPage />} />
 
+				{/* Страницы ленты заказов */}
+				<Route path='/feed' element={<FeedPage />} />
+				<Route path='/feed/:number' element={<OrderPage />} />
+
+				{/* Страница заказа профиля для прямого перехода */}
+				<Route
+					path='/profile/orders/:number'
+					element={<ProtectedRouteElement element={<OrderPage />} />}
+				/>
+
 				{/* 404 страница */}
 				<Route path='*' element={<NotFoundPage />} />
 			</Routes>
@@ -86,60 +94,56 @@ export const AppRoutes: React.FC = () => {
 			{background && (
 				<Routes>
 					<Route path='/ingredients/:id' element={<IngredientModalWrapper />} />
-					<Route path='/orders/:number' element={<OrderModalWrapper />} />
+					<Route path='/orders/:number' element={<OrdersModalRoute />} />
+					<Route path='/feed/:number' element={<FeedModalRoute />} />
+					<Route
+						path='/profile/orders/:number'
+						element={
+							<ProtectedRouteElement element={<ProfileOrdersModalRoute />} />
+						}
+					/>
 				</Routes>
 			)}
 		</>
 	);
 };
 
-// Компонент-обёртка для модального окна ингредиента
-const IngredientModalWrapper: React.FC = () => {
+// Простые компоненты-роуты
+const OrdersModalRoute: React.FC = () => {
+	const { number } = useParams<{ number: string }>();
 	const location = useLocation();
-	const navigate = useNavigate();
-
-	const ingredients = useAppSelector(selectIngredients);
-	const background = location.state?.background;
-
-	const ingredientId = location.pathname.split('/')[2];
-	const ingredient = ingredients.find((item) => item._id === ingredientId);
-
-	const handleCloseModal = () => {
-		navigate(background || '/', { replace: true });
-	};
-
-	if (!ingredient) {
-		return null;
-	}
+	const orderNumber = number ? parseInt(number, 10) : undefined;
+	const isNewOrder = location.state?.isNewOrder;
 
 	return (
-		<Modal title='Детали ингредиента' onClose={handleCloseModal}>
-			<IngredientDetails ingredient={ingredient} />
-		</Modal>
+		<UniversalOrderModalWrapper
+			orderNumber={orderNumber}
+			fallbackPath='/'
+			isNewOrder={isNewOrder}
+		/>
 	);
 };
 
-// Добавить компонент OrderModalWrapper:
-const OrderModalWrapper: React.FC = () => {
-	const location = useLocation();
-	const navigate = useNavigate();
-	const background = location.state?.background;
-
-	// Получаем данные заказа из Redux состояния
-	const { orderNumber, orderName } = useAppSelector((state) => state.order);
-
-	const handleCloseModal = () => {
-		navigate(background || '/', { replace: true });
-	};
-
-	// Проверяем, что данные заказа есть
-	if (!orderNumber || !orderName) {
-		return null;
-	}
+const FeedModalRoute: React.FC = () => {
+	const { number } = useParams<{ number: string }>();
+	const orderNumber = number ? parseInt(number, 10) : undefined;
 
 	return (
-		<Modal title='Заказ оформлен' onClose={handleCloseModal}>
-			<OrderDetails orderNumber={orderNumber} orderName={orderName} />
-		</Modal>
+		<UniversalOrderModalWrapper
+			orderNumber={orderNumber}
+			fallbackPath='/feed'
+		/>
+	);
+};
+
+const ProfileOrdersModalRoute: React.FC = () => {
+	const { number } = useParams<{ number: string }>();
+	const orderNumber = number ? parseInt(number, 10) : undefined;
+
+	return (
+		<UniversalOrderModalWrapper
+			orderNumber={orderNumber}
+			fallbackPath='/profile/orders'
+		/>
 	);
 };

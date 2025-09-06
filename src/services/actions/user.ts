@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { apiRequest } from '@/utils/api';
+import { api, apiRequest } from '@/utils/api';
 import { API_ENDPOINTS } from '@/constants/api';
+import { refreshToken } from '@services/actions/auth';
 import { tokenService } from '@services/token-service';
 
 // Типы для запросов и ответов
@@ -17,6 +18,31 @@ export interface UpdateUserRequest {
 	name?: string;
 	password?: string;
 }
+
+export const checkAuthUser = createAsyncThunk(
+	'auth/checkAuthUser',
+	async (_, { dispatch, rejectWithValue }) => {
+		try {
+			const accessToken = tokenService.getAccessToken();
+			const refreshTokenValue = tokenService.getRefreshToken();
+
+			if (!refreshTokenValue) {
+				return rejectWithValue('Нет токена обновления');
+			}
+
+			// Если access token истек, обновляем его
+			if (!accessToken || tokenService.isTokenExpired(accessToken)) {
+				await dispatch(refreshToken()).unwrap();
+			}
+
+			// Получаем данные пользователя
+			return await api.get('/auth/user');
+		} catch (error) {
+			tokenService.clearTokens();
+			return rejectWithValue('Ошибка проверки авторизации');
+		}
+	}
+);
 
 // Получение данных о пользователе
 export const getUser = createAsyncThunk<

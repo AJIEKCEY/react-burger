@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAppDispatch, useAppSelector } from '@hooks/redux';
 import { fetchIngredients } from '@services/actions/burger-ingredients';
 import {
-	selectIngredients,
 	selectIngredientsLoading,
 	selectIngredientsError,
 } from '@services/selectors';
@@ -14,16 +13,8 @@ import styles from './home.module.css';
 
 export const HomePage: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const ingredients = useAppSelector(selectIngredients);
 	const loading = useAppSelector(selectIngredientsLoading);
 	const error = useAppSelector(selectIngredientsError);
-
-	// Загружаем ингредиенты при монтировании
-	useEffect(() => {
-		if (ingredients.length === 0) {
-			dispatch(fetchIngredients());
-		}
-	}, [dispatch, ingredients.length]);
 
 	if (loading) {
 		return (

@@ -6,3 +6,5 @@ export { ResetPasswordPage } from './reset-password/reset-password';
 export { ProfilePage } from './profile/profile';
 export { IngredientPage } from './ingredient/ingredient';
 export { NotFoundPage } from './404/not-found';
+export { FeedPage } from './feed/feed';
+export { OrderPage } from './order/order';

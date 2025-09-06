@@ -90,7 +90,10 @@ export const useBurgerConstructor = () => {
 
 			// Переходим на URL с модалкой заказа
 			navigate(`/orders/${result.order.number}`, {
-				state: { background: location },
+				state: {
+					background: location,
+					isNewOrder: true,
+				},
 			});
 
 			handleClearConstructor();

@@ -7,6 +7,7 @@ export interface CustomLocationState {
 	orderIntent?: boolean;
 	autoSubmitOrder?: boolean;
 	canResetPassword?: boolean;
+	isNewOrder?: boolean;
 }
 
 // Используем дженерик Location
@@ -69,6 +70,35 @@ export interface IOrderState {
 	error: string | null;
 }
 
+// Типы для WebSocket
+export interface WebSocketMessage<T = unknown> {
+	success: boolean;
+	data?: T;
+	error?: string;
+}
+
+export interface WebSocketConnectionConfig {
+	url: string;
+	protocols?: string | string[];
+	options?: {
+		reconnect?: boolean;
+		reconnectInterval?: number;
+		maxReconnectAttempts?: number;
+	};
+}
+
+// Типы для ошибок
+export interface ApiError {
+	success: boolean;
+	message: string;
+	statusCode?: number;
+}
+
+export interface ValidationError {
+	field: string;
+	message: string;
+}
+
 // RootState теперь импортируется из store.ts
 import { RootState } from '@services/store';
 export type { RootState };
@@ -81,3 +111,20 @@ export type TThunkAction<R = void> = import('@reduxjs/toolkit').ThunkAction<
 	unknown,
 	import('@reduxjs/toolkit').AnyAction
 >;
+
+// Утилитарные типы
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type Nullable<T> = T | null;
+export type NonNullable<T> = T extends null | undefined ? never : T;
+
+// Типы для форм
+export type FormErrors<T> = Partial<Record<keyof T, string>>;
+export type FormTouched<T> = Partial<Record<keyof T, boolean>>;
+
+export interface FormState<T> {
+	values: T;
+	errors: FormErrors<T>;
+	touched: FormTouched<T>;
+	isSubmitting: boolean;
+	isValid: boolean;
+}

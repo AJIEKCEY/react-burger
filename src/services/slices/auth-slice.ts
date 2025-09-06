@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
 	loginUser,
 	registerUser,
@@ -8,6 +8,7 @@ import {
 } from '../actions/auth';
 import { getUser, updateUser } from '../actions/user';
 import { tokenService } from '@services/token-service';
+import { api, ApiRequestError } from '@utils/api.ts';
 
 export interface User {
 	email: string;
@@ -23,8 +24,8 @@ export interface AuthState {
 }
 
 const initialState: AuthState = {
-	user: null,
-	isAuthenticated: false,
+	user: tokenService.getUserData(),
+	isAuthenticated: tokenService.hasValidTokens(),
 	isLoading: false,
 	error: null,
 	isAuthChecked: false,
@@ -145,8 +146,53 @@ const authSlice = createSlice({
 			})
 			.addCase(updateUser.fulfilled, (state, action) => {
 				state.user = action.payload.user;
+			})
+			// Добавляем обработку updateUserInfo
+			.addCase(updateUserInfo.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(updateUserInfo.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.user = action.payload;
+			})
+			.addCase(updateUserInfo.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload || 'Ошибка обновления данных пользователя';
 			});
 	},
+});
+
+// Добавляем новый thunk для обновления информации о пользователе
+export const updateUserInfo = createAsyncThunk<
+	User,
+	Partial<{ name: string; email: string; password: string }>,
+	{
+		rejectValue: string;
+	}
+>('auth/updateUserInfo', async (userData, { rejectWithValue }) => {
+	try {
+		const response = await api.patch<{ success: boolean; user: User }>(
+			'/auth/user',
+			userData
+		);
+
+		if (response.success) {
+			return response.user;
+		} else {
+			return rejectWithValue('Не удалось обновить данные пользователя');
+		}
+	} catch (error) {
+		if (error instanceof ApiRequestError) {
+			return rejectWithValue(error.message);
+		}
+
+		if (error instanceof Error) {
+			return rejectWithValue(error.message);
+		}
+
+		return rejectWithValue('Произошла ошибка при обновлении данных');
+	}
 });
 
 export const { clearError, clearAuth } = authSlice.actions;
