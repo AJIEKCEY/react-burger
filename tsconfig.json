@@ -31,10 +31,16 @@
 			"@hooks/*": ["src/hooks/*"],
 			"@pages/*": ["src/pages/*"],
 			"@types/*": ["src/types/*"]
-		}
+		},
+		"types": ["vitest/globals", "@testing-library/jest-dom"]
 	},
 	"plugins": [{ "name": "typescript-plugin-css-modules" }],
-	"include": ["src"],
-	"references": [{ "path": "./tsconfig.node.json" }],
-	"types": ["@testing-library/jest-dom"]
+	"include": [
+		"src",
+		"vitest.config.ts",
+		"vite.config.ts",
+		"src/**/*.test.ts",
+		"src/**/*.test.tsx"
+	],
+	"references": [{ "path": "./tsconfig.node.json" }]
 }
