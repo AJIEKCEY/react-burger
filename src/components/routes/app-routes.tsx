@@ -27,7 +27,6 @@ export const AppRoutes: React.FC = () => {
 			<Routes location={background || location}>
 				{/* Основная страница бургера */}
 				<Route path='/' element={<HomePage />} />
-				<Route path='/react-burger' element={<HomePage />} />
 
 				{/* Маршруты только для неавторизованных пользователей */}
 				<Route
