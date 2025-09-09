@@ -43,7 +43,8 @@ export const BurgerIngredient = ({
 		<article
 			ref={dragRef}
 			className={`${styles.card} ${isDragging ? styles.dragging : ''}`}
-			onClick={handleClick}>
+			onClick={handleClick}
+			data-testid='ingredient_card'>
 			<img
 				src={ingredient.image}
 				alt={ingredient.name}
