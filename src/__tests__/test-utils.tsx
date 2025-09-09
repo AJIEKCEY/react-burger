@@ -1,78 +1,9 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { render, type RenderOptions } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { ReactElement } from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { vi } from 'vitest';
 
-// Импортируем наши настоящие слайсы
-// import authSlice from '../services/slices/auth-slice'
-// import burgerConstructorSlice from '../services/slices/burger-constructor-slice'
-// import burgerIngredientsSlice from '../services/slices/burger-ingredients-slice'
-
-// Обновляем RootState согласно нашим слайсам
-export interface RootState {
-	// auth: ReturnType<typeof authSlice>
-	// burgerConstructor: ReturnType<typeof burgerConstructorSlice>
-	// burgerIngredients: ReturnType<typeof burgerIngredientsSlice>
-}
-
 /**
- * Создает тестовый Redux store с возможностью предустановки состояния
- * @param preloadedState - начальное состояние store для теста
+ * Легковесные утилиты для тестов, не зависящие от Redux/Router/DnD.
+ * Для рендера компонентов используйте helpers из '@/__tests__/render-utils'.
  */
-export const createTestStore = (preloadedState: Partial<RootState> = {}) => {
-	return configureStore({
-		reducer: {
-			// TODO: Заменить на настоящие слайсы
-			// auth: authSlice,
-			// burgerConstructor: burgerConstructorSlice,
-			// burgerIngredients: burgerIngredientsSlice,
-		},
-		preloadedState, // Убираем type assertion, он не нужен
-		// Отключаем middleware для тестов (по желанию)
-		middleware: (getDefaultMiddleware) =>
-			getDefaultMiddleware({
-				serializableCheck: false,
-			}),
-	});
-};
-
-interface ExtendedRenderOptions extends Omit<RenderOptions, 'wrapper'> {
-	preloadedState?: Partial<RootState>;
-	store?: ReturnType<typeof createTestStore>;
-}
-
-/**
- * Рендерит компонент с необходимыми провайдерами для тестирования
- * @param ui - компонент для рендера
- * @param options - опции рендеринга включая preloadedState
- */
-export const renderWithProviders = (
-	ui: ReactElement,
-	{
-		preloadedState = {},
-		store = createTestStore(preloadedState),
-		...renderOptions
-	}: ExtendedRenderOptions = {}
-) => {
-	const Wrapper = ({ children }: { children: React.ReactNode }) => {
-		return (
-			<BrowserRouter>
-				<Provider store={store}>
-					<DndProvider backend={HTML5Backend}>{children}</DndProvider>
-				</Provider>
-			</BrowserRouter>
-		);
-	};
-
-	return {
-		store,
-		...render(ui, { wrapper: Wrapper, ...renderOptions }),
-	};
-};
 
 /**
  * Мокированные данные ингредиента для тестов
