@@ -3,7 +3,7 @@ import vitePreprocessor from 'cypress-vite';
 
 export default defineConfig({
 	e2e: {
-		baseUrl: 'http://localhost:5175',
+		baseUrl: 'http://localhost:5173/react-burger/',
 		viewportWidth: 1280,
 		viewportHeight: 1000,
 		setupNodeEvents(on) {

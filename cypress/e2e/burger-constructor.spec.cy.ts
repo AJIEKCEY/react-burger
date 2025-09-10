@@ -50,9 +50,7 @@ describe('Страница Конструктор', () => {
 		cy.get('.constructor-element').contains(/соус/i).should('exist');
 
 		// Проверить, что кнопка оформления активна
-		cy.contains('Войти для оформления|Оформить заказ')
-			.should('be.enabled')
-			.click();
+		cy.contains('Войти для оформления').should('be.enabled').click();
 
 		// При необходимости залогиниться
 		cy.url().then((url) => {
