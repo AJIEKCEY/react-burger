@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -5,7 +6,10 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [react()],
-	base: '',
+	base: '/react-burger/',
+	build: {
+		outDir: 'dist',
+	},
 	resolve: {
 		alias: {
 			'@': path.resolve(__dirname, './src'),
@@ -20,7 +24,10 @@ export default defineConfig({
 	test: {
 		globals: true,
 		environment: 'jsdom',
-		setupFiles: ['./vitest-setup.js'],
+		setupFiles: ['./vitest-setup.ts'],
+		typecheck: {
+			checker: 'tsc',
+		},
 	},
 	server: {
 		open: true,

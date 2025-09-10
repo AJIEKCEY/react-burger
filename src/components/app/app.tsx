@@ -29,7 +29,7 @@ export const App = (): React.JSX.Element => {
 	}, [dispatch, isAuthChecked]);
 
 	return (
-		<Router>
+		<Router basename='/react-burger'>
 			<AppHeader />
 			<AppRoutes />
 		</Router>

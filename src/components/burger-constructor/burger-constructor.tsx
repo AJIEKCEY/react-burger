@@ -73,7 +73,10 @@ export const BurgerConstructor = (): React.JSX.Element => {
 
 	return (
 		<section className={`${styles.burger_constructor} pt-25`}>
-			<div ref={dropRef} className={isOver && canDrop ? styles.dragOver : ''}>
+			<div
+				ref={dropRef}
+				className={isOver && canDrop ? styles.dragOver : ''}
+				data-testid='constructor_drop_zone'>
 				<div className={styles.elements}>
 					{bun && (
 						<div className={styles.element}>
